@@ -11,7 +11,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-change-this-in-production-xyz-123-abc')
 DEBUG      = os.environ.get('DEBUG', 'True') == 'True'
-ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost 127.0.0.1').split()
+ALLOWED_HOSTS = os.environ.get(
+    'ALLOWED_HOSTS',
+    'localhost 127.0.0.1'
+).split(',')
+
+CSRF_TRUSTED_ORIGINS = [
+    'https://alumni-connect-2kfj.onrender.com',
+    'http://localhost:8000',
+]
 
 INSTALLED_APPS = [
     'django.contrib.admin',
