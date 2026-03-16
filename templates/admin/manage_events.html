@@ -1,0 +1,71 @@
+{% extends "shared/dashboard_base.html" %}
+{% block page_title %}Manage Events{% endblock %}
+{% block breadcrumb %}Admin / <span>Events</span>{% endblock %}
+{% block sidebar_nav %}{% include "admin/partials/sidebar.html" %}{% endblock %}
+
+{% block dashboard_content %}
+<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-xl);flex-wrap:wrap;gap:var(--space-md);">
+  <div><h3>Manage Events</h3><p style="color:var(--text-muted);">Create, edit, and monitor alumni events</p></div>
+  <button class="btn btn-gold" onclick="toggleCreateForm()"><i class="fas fa-plus"></i> Create Event</button>
+</div>
+
+<!-- Create Event Form (toggleable) -->
+<div class="card card-gold-accent" id="createEventForm" style="display:none;margin-bottom:var(--space-xl);">
+  <h4 style="margin-bottom:var(--space-xl);">Create New Event</h4>
+  <form method="POST" action="{% url 'manage_events' %}">
+    {% csrf_token %}
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-md);">
+      <div class="form-group" style="grid-column:span 2;"><label class="form-label">Event Title *</label><input type="text" name="title" class="form-input" required></div>
+      <div class="form-group"><label class="form-label">Event Date *</label><input type="datetime-local" name="event_date" class="form-input" required></div>
+      <div class="form-group"><label class="form-label">Event Type</label><select name="event_type" class="form-select"><option value="on_campus">On Campus</option><option value="online">Online</option><option value="hybrid">Hybrid</option></select></div>
+      <div class="form-group"><label class="form-label">Venue / Link</label><input type="text" name="location" class="form-input" placeholder="Main Auditorium or Zoom link"></div>
+      <div class="form-group"><label class="form-label">Capacity</label><input type="number" name="capacity" class="form-input" placeholder="200"></div>
+      <div class="form-group" style="grid-column:span 2;"><label class="form-label">Description</label><textarea name="description" class="form-textarea" rows="3"></textarea></div>
+    </div>
+    <div style="display:flex;gap:var(--space-md);">
+      <button type="submit" class="btn btn-gold"><i class="fas fa-plus"></i> Create Event</button>
+      <button type="button" class="btn btn-ghost" onclick="toggleCreateForm()">Cancel</button>
+    </div>
+  </form>
+</div>
+
+<!-- Events Table -->
+<div class="card">
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Event</th><th>Date</th><th>Type</th><th>Registrations</th><th>Status</th><th>Actions</th></tr></thead>
+      <tbody>
+        {% for event in events %}
+        <tr>
+          <td><div style="font-weight:500;color:var(--navy);">{{ event.title }}</div><div style="font-size:0.75rem;color:var(--text-muted);">{{ event.location }}</div></td>
+          <td style="font-size:0.875rem;">{{ event.event_date }}</td>
+          <td><span class="badge {% if event.event_type == 'online' %}badge-sage{% else %}badge-navy{% endif %}">{{ event.event_type|title }}</span></td>
+          <td>{{ event.registered_count }} / {{ event.capacity }}</td>
+          <td><span class="badge {% if event.is_upcoming %}badge-green{% else %}badge-gold{% endif %}">{% if event.is_upcoming %}Upcoming{% else %}Past{% endif %}</span></td>
+          <td><div style="display:flex;gap:4px;"><a href="{% url 'edit_event' event.pk %}" class="btn btn-ghost btn-sm"><i class="fas fa-edit"></i></a><form method="POST" action="{% url 'delete_event' event.pk %}" style="display:inline;" onsubmit="return confirm('Delete event?')">{% csrf_token %}<button type="submit" class="btn btn-ghost btn-sm" style="color:var(--crimson);"><i class="fas fa-trash"></i></button></form></div></td>
+        </tr>
+        {% empty %}
+        {% for i in "123456" %}
+        <tr>
+          <td><div style="font-weight:500;color:var(--navy);">{% cycle "Annual Alumni Meet 2024" "Career Fair Webinar" "Tech Talk: AI in Industry" "Startup Founders Panel" "Resume Workshop" "Alumni Reunion Batch 2018" %}</div><div style="font-size:0.75rem;color:var(--text-muted);">{% cycle "Main Auditorium" "Online – Zoom" "CS Seminar Hall" "MBA Hall" "Online – Teams" "Jubilee Hall" %}</div></td>
+          <td style="font-size:0.875rem;">Aug {% cycle "18" "24" "30" "Sep 5" "Sep 15" "Oct 2" %}, 2024</td>
+          <td><span class="badge {% cycle 'badge-navy' 'badge-sage' 'badge-sage' 'badge-navy' 'badge-sage' 'badge-navy' %}">{% cycle "On Campus" "Online" "Online" "On Campus" "Online" "On Campus" %}</span></td>
+          <td>{% cycle "87/200" "142/300" "65/100" "38/80" "56/120" "94/150" %}</td>
+          <td><span class="badge badge-green">Upcoming</span></td>
+          <td><div style="display:flex;gap:4px;"><button class="btn btn-ghost btn-sm"><i class="fas fa-edit"></i></button><button class="btn btn-ghost btn-sm" style="color:var(--crimson);"><i class="fas fa-trash"></i></button></div></td>
+        </tr>
+        {% endfor %}
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>
+function toggleCreateForm() {
+  const form = document.getElementById('createEventForm');
+  form.style.display = form.style.display === 'none' ? 'block' : 'none';
+}
+</script>
+{% endblock %}

@@ -1,0 +1,22 @@
+{# student/partials/sidebar.html #}
+<p class="sidebar-section-label">Main</p>
+<a href="{% url 'student_dashboard' %}" class="sidebar-link {% if request.resolver_match.url_name == 'student_dashboard' %}active{% endif %}"><span class="link-icon"><i class="fas fa-th-large"></i></span> Dashboard</a>
+<a href="{% url 'student_profile' %}" class="sidebar-link {% if request.resolver_match.url_name == 'student_profile' %}active{% endif %}"><span class="link-icon"><i class="fas fa-user"></i></span> My Profile</a>
+<p class="sidebar-section-label">Discover</p>
+<a href="{% url 'alumni_search' %}" class="sidebar-link {% if request.resolver_match.url_name == 'alumni_search' %}active{% endif %}"><span class="link-icon"><i class="fas fa-search"></i></span> Search Alumni</a>
+<a href="{% url 'alumni_directory' %}" class="sidebar-link {% if 'directory' in request.resolver_match.url_name %}active{% endif %}"><span class="link-icon"><i class="fas fa-address-book"></i></span> Alumni Directory</a>
+<p class="sidebar-section-label">Opportunities</p>
+<a href="{% url 'student_jobs' %}" class="sidebar-link {% if request.resolver_match.url_name == 'student_jobs' %}active{% endif %}"><span class="link-icon"><i class="fas fa-briefcase"></i></span> Job Board</a>
+<a href="{% url 'student_internships' %}" class="sidebar-link {% if request.resolver_match.url_name == 'student_internships' %}active{% endif %}"><span class="link-icon"><i class="fas fa-graduation-cap"></i></span> Internships</a>
+<a href="{% url 'career_guidance' %}" class="sidebar-link {% if request.resolver_match.url_name == 'career_guidance' %}active{% endif %}"><span class="link-icon"><i class="fas fa-compass"></i></span> Career Guidance</a>
+<p class="sidebar-section-label">Events</p>
+<a href="{% url 'student_events' %}" class="sidebar-link {% if request.resolver_match.url_name == 'student_events' %}active{% endif %}"><span class="link-icon"><i class="fas fa-calendar-alt"></i></span> Events</a>
+<p class="sidebar-section-label">Communication</p>
+<a href="{% url 'student_messages' %}" class="sidebar-link {% if request.resolver_match.url_name == 'student_messages' %}active{% endif %}"><span class="link-icon"><i class="fas fa-comments"></i></span> Messages{% if unread_messages %}<span class="badge-count">{{ unread_messages }}</span>{% endif %}</a>
+<a href="{% url 'notifications' %}" class="sidebar-link {% if request.resolver_match.url_name == 'notifications' %}active{% endif %}"><span class="link-icon"><i class="fas fa-bell"></i></span> Notifications</a>
+<p class="sidebar-section-label">AI Tools</p>
+<a href="{% url 'ai_chat' %}" class="sidebar-link {% if request.resolver_match.url_name == 'ai_chat' %}active{% endif %}"><span class="link-icon"><i class="fas fa-robot"></i></span> AI Assistant</a>
+<a href="{% url 'ai_career_guidance' %}" class="sidebar-link {% if request.resolver_match.url_name == 'ai_career_guidance' %}active{% endif %}"><span class="link-icon"><i class="fas fa-chart-line"></i></span> AI Career Guide</a>
+<a href="{% url 'ai_alumni_finder' %}" class="sidebar-link {% if request.resolver_match.url_name == 'ai_alumni_finder' %}active{% endif %}"><span class="link-icon"><i class="fas fa-user-friends"></i></span> AI Alumni Finder</a>
+<a href="{% url 'ai_job_recommendations' %}" class="sidebar-link {% if request.resolver_match.url_name == 'ai_job_recommendations' %}active{% endif %}"><span class="link-icon"><i class="fas fa-magic"></i></span> Job Recommender</a>
+<a href="{% url 'ai_help_center' %}" class="sidebar-link {% if request.resolver_match.url_name == 'ai_help_center' %}active{% endif %}"><span class="link-icon"><i class="fas fa-question-circle"></i></span> AI Help Center</a>

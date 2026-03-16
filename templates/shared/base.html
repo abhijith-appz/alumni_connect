@@ -1,0 +1,160 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}AlumniConnect — {% endblock %}Vast</title>
+  <meta name="description" content="{% block meta_desc %}Alumni Management System powered by AI{% endblock %}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="{% static 'css/base.css' %}">
+  <link rel="stylesheet" href="{% static 'css/layout.css' %}">
+  <link rel="stylesheet" href="{% static 'css/pages.css' %}">
+  {% block extra_css %}{% endblock %}
+</head>
+<body class="{% block body_class %}{% endblock %}">
+
+<!-- ── Navbar ── -->
+{% block navbar %}
+<nav class="navbar">
+  <div class="navbar-inner">
+    <a href="{% url 'home' %}" class="navbar-brand">
+      <div class="navbar-logo">A</div>
+      <div class="navbar-brand-text">
+        <span class="navbar-brand-name">AlumniConnect</span>
+        <span class="navbar-brand-sub">Vast</span>
+      </div>
+    </a>
+
+    <ul class="navbar-nav hide-mobile">
+      <li><a href="{% url 'home' %}" class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}">Home</a></li>
+      <li><a href="{% url 'about' %}" class="nav-link {% if request.resolver_match.url_name == 'about' %}active{% endif %}">About</a></li>
+      <li><a href="{% url 'alumni_directory' %}" class="nav-link {% if request.resolver_match.url_name == 'alumni_directory' %}active{% endif %}">Directory</a></li>
+      <li><a href="{% url 'contact' %}" class="nav-link {% if request.resolver_match.url_name == 'contact' %}active{% endif %}">Contact</a></li>
+      <li><a href="{% url 'faq' %}" class="nav-link {% if request.resolver_match.url_name == 'faq' %}active{% endif %}">FAQ</a></li>
+    </ul>
+
+    <div class="navbar-actions">
+      {% if user.is_authenticated %}
+        <a href="{% if user.is_student %}{% url 'student_dashboard' %}{% elif user.is_alumni %}{% url 'alumni_dashboard' %}{% else %}{% url 'admin_dashboard' %}{% endif %}" class="btn btn-gold btn-sm">
+          <i class="fas fa-th-large"></i> Dashboard
+        </a>
+      {% else %}
+        <a href="{% url 'login' %}" class="btn btn-outline btn-sm" style="color:var(--ivory); border-color:rgba(245,240,232,0.4);">Log In</a>
+        <a href="{% url 'register_student' %}" class="btn btn-gold btn-sm">Register</a>
+      {% endif %}
+      <button class="mobile-menu-btn" onclick="toggleMobileMenu()" aria-label="Menu">
+        <i class="fas fa-bars"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile nav -->
+  <div class="mobile-nav" id="mobileNav" style="display:none; padding:var(--space-md); border-top:1px solid rgba(255,255,255,0.08);">
+    <ul style="list-style:none; display:flex; flex-direction:column; gap:4px;">
+      <li><a href="{% url 'home' %}" class="nav-link">Home</a></li>
+      <li><a href="{% url 'about' %}" class="nav-link">About</a></li>
+      <li><a href="{% url 'alumni_directory' %}" class="nav-link">Directory</a></li>
+      <li><a href="{% url 'contact' %}" class="nav-link">Contact</a></li>
+      <li><a href="{% url 'faq' %}" class="nav-link">FAQ</a></li>
+    </ul>
+  </div>
+</nav>
+{% endblock %}
+
+<!-- ── Messages / Alerts ── -->
+{% if messages %}
+<div style="position:fixed; top:80px; right:20px; z-index:9999; display:flex; flex-direction:column; gap:8px; max-width:360px;">
+  {% for message in messages %}
+  <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %}" style="box-shadow:var(--shadow-md); animation: slideIn 0.3s ease;">
+    <i class="fas fa-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}exclamation-circle{% elif message.tags == 'warning' %}exclamation-triangle{% else %}info-circle{% endif %}"></i>
+    <span>{{ message }}</span>
+    <button onclick="this.parentElement.remove()" style="background:none;border:none;cursor:pointer;margin-left:auto;color:inherit;font-size:1rem;">&times;</button>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+<!-- ── Main Content ── -->
+<main>
+  {% block content %}{% endblock %}
+</main>
+
+<!-- ── Footer ── -->
+{% block footer %}
+<footer class="footer">
+  <div class="footer-grid">
+    <div class="footer-brand-col">
+      <div class="footer-logo-row">
+        <div class="footer-logo">A</div>
+        <span class="footer-brand-name">AlumniConnect</span>
+      </div>
+      <p class="footer-tagline">Bridging students and alumni through knowledge, opportunities, and lasting connections at Vast.</p>
+      <div class="footer-social">
+        <a href="#" class="social-icon"><i class="fab fa-linkedin-in"></i></a>
+        <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
+        <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
+        <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
+      </div>
+    </div>
+    <div>
+      <p class="footer-col-title">Navigation</p>
+      <ul class="footer-links">
+        <li><a href="{% url 'home' %}">Home</a></li>
+        <li><a href="{% url 'about' %}">About Us</a></li>
+        <li><a href="{% url 'alumni_directory' %}">Alumni Directory</a></li>
+        <li><a href="{% url 'faq' %}">FAQ</a></li>
+        <li><a href="{% url 'contact' %}">Contact</a></li>
+      </ul>
+    </div>
+    <div>
+      <p class="footer-col-title">For Students</p>
+      <ul class="footer-links">
+        <li><a href="{% url 'register_student' %}">Register</a></li>
+        <li><a href="{% url 'login' %}">Login</a></li>
+        <li><a href="{% url 'student_jobs' %}">Job Board</a></li>
+        <li><a href="{% url 'student_events' %}">Events</a></li>
+        <li><a href="{% url 'career_guidance' %}">Career Guidance</a></li>
+      </ul>
+    </div>
+    <div>
+      <p class="footer-col-title">Contact</p>
+      <ul class="footer-links">
+        <li><a href="mailto:alumni@stxaviers.edu"><i class="fas fa-envelope" style="width:14px;margin-right:6px;"></i>alumni@stxaviers.edu</a></li>
+        <li><a href="tel:+91-000-0000000"><i class="fas fa-phone" style="width:14px;margin-right:6px;"></i>+91 000 0000000</a></li>
+        <li><span><i class="fas fa-map-marker-alt" style="width:14px;margin-right:6px;"></i>St. Xavier's Campus, Mumbai</span></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>&copy; 2025 Vast — AlumniConnect. All rights reserved.</span>
+    <span>
+      <a href="#" style="color:inherit;">Privacy Policy</a> &nbsp;·&nbsp;
+      <a href="#" style="color:inherit;">Terms of Use</a>
+    </span>
+  </div>
+</footer>
+{% endblock %}
+
+{% block ai_fab %}{% endblock %}
+
+<script src="{% static 'js/main.js' %}"></script>
+{% block extra_js %}{% endblock %}
+
+<style>
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(20px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+</style>
+
+<script>
+function toggleMobileMenu() {
+  const nav = document.getElementById('mobileNav');
+  nav.style.display = nav.style.display === 'none' ? 'block' : 'none';
+}
+</script>
+</body>
+</html>

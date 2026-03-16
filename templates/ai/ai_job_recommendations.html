@@ -1,0 +1,115 @@
+{% extends "shared/dashboard_base.html" %}
+{% block page_title %}AI Job Recommendations{% endblock %}
+{% block breadcrumb %}AI Tools / <span>Job Recommender</span>{% endblock %}
+{% block sidebar_nav %}{% include "student/partials/sidebar.html" %}{% endblock %}
+
+{% block dashboard_content %}
+<div style="display:grid;grid-template-columns:1fr 2fr;gap:var(--space-xl);">
+  <!-- Preferences Panel -->
+  <div>
+    <div class="card card-gold-accent">
+      <h4 style="margin-bottom:var(--space-md);"><i class="fas fa-sliders-h" style="color:var(--gold);margin-right:8px;"></i>Your Preferences</h4>
+      <p style="font-size:0.8125rem;color:var(--text-muted);margin-bottom:var(--space-lg);">The AI will use these to personalise your job recommendations.</p>
+      <form method="POST" action="{% url 'ai_job_recommendations' %}">
+        {% csrf_token %}
+        <div class="form-group">
+          <label class="form-label">Preferred Roles</label>
+          <input type="text" name="preferred_roles" class="form-input" placeholder="Software Engineer, Data Analyst…" value="{{ user.student_profile.preferred_roles }}">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Preferred Location</label>
+          <select name="location" class="form-select">
+            <option value="">Any Location</option>
+            <option value="bangalore">Bangalore</option>
+            <option value="mumbai">Mumbai</option>
+            <option value="delhi">Delhi / NCR</option>
+            <option value="hyderabad">Hyderabad</option>
+            <option value="pune">Pune</option>
+            <option value="remote">Remote Only</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Job Type</label>
+          <select name="job_type" class="form-select">
+            <option value="">Any Type</option>
+            <option value="full_time">Full Time</option>
+            <option value="internship">Internship</option>
+            <option value="part_time">Part Time</option>
+            <option value="remote">Remote</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Industry</label>
+          <select name="industry" class="form-select">
+            <option value="">Any Industry</option>
+            <option value="tech">Technology</option>
+            <option value="finance">Finance / Banking</option>
+            <option value="consulting">Consulting</option>
+            <option value="healthcare">Healthcare</option>
+            <option value="ecommerce">E-Commerce</option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn-gold" style="width:100%;justify-content:center;"><i class="fas fa-magic"></i> Get Recommendations</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Recommendations -->
+  <div>
+    <div style="display:flex;align-items:center;gap:var(--space-sm);margin-bottom:var(--space-lg);">
+      <i class="fas fa-robot" style="color:var(--gold);font-size:1.1rem;"></i>
+      <h4>Recommended for You</h4>
+      <span class="badge badge-gold" style="margin-left:auto;">AI Matched</span>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:var(--space-md);">
+      {% for job in recommended_jobs %}
+      <a href="{% url 'job_detail' job.pk %}" class="job-rec-card">
+        <div style="display:flex;align-items:flex-start;gap:var(--space-md);">
+          <div style="width:52px;height:52px;border-radius:var(--radius-md);background:var(--navy);color:var(--gold);font-family:var(--font-display);font-weight:700;font-size:1.3rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;">{{ job.company.0 }}</div>
+          <div style="flex:1;">
+            <div style="display:flex;align-items:center;gap:var(--space-sm);justify-content:space-between;flex-wrap:wrap;">
+              <span style="font-weight:600;color:var(--navy);font-size:1rem;">{{ job.title }}</span>
+              <span class="badge badge-gold">{{ job.ai_match_score }}% match</span>
+            </div>
+            <div style="font-size:0.875rem;color:var(--text-secondary);">{{ job.company }} · {{ job.location }}</div>
+            <div style="background:var(--border);border-radius:var(--radius-full);height:4px;overflow:hidden;margin:8px 0;"><div style="width:{{ job.ai_match_score }}%;height:100%;background:linear-gradient(90deg,var(--gold),var(--sage-light));border-radius:var(--radius-full);"></div></div>
+            <p style="font-size:0.8125rem;color:var(--text-muted);">{{ job.ai_reason }}</p>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;">
+              <span class="badge badge-navy">{{ job.type }}</span>
+              {% if job.salary %}<span class="badge badge-sage">{{ job.salary }}</span>{% endif %}
+            </div>
+          </div>
+        </div>
+      </a>
+      {% empty %}
+      {% for j in "12345" %}
+      <div class="job-rec-card">
+        <div style="display:flex;align-items:flex-start;gap:var(--space-md);">
+          <div style="width:52px;height:52px;border-radius:var(--radius-md);background:var(--navy);color:var(--gold);font-family:var(--font-display);font-weight:700;font-size:1.3rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;">{% cycle "G" "A" "F" "Z" "I" %}</div>
+          <div style="flex:1;">
+            <div style="display:flex;align-items:center;gap:var(--space-sm);justify-content:space-between;flex-wrap:wrap;">
+              <span style="font-weight:600;color:var(--navy);font-size:1rem;">{% cycle "Software Engineer L4" "Data Scientist" "Backend Developer" "ML Engineer" "Full Stack Developer" %}</span>
+              <span class="badge badge-gold">{% cycle "96" "91" "88" "84" "79" %}% match</span>
+            </div>
+            <div style="font-size:0.875rem;color:var(--text-secondary);">{% cycle "Google · Bangalore" "Amazon · Hyderabad" "Flipkart · Bangalore" "Zerodha · Mumbai" "IBM · Pune" %}</div>
+            <div style="background:var(--border);border-radius:var(--radius-full);height:4px;overflow:hidden;margin:8px 0;"><div style="width:{% cycle "96" "91" "88" "84" "79" %}%;height:100%;background:linear-gradient(90deg,var(--gold),var(--sage-light));border-radius:var(--radius-full);"></div></div>
+            <p style="font-size:0.8125rem;color:var(--text-muted);">{% cycle "Your Python and system design skills are a strong match for this role." "Your interest in ML and analytical background align perfectly." "Strong backend experience required — matches your skill set." "Fintech startup — suits your interest in Python and finance." "Full stack role requiring React + Django — your exact stack." %}</p>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;">
+              <span class="badge badge-navy">Full Time</span>
+              <span class="badge badge-sage">₹{% cycle "14-20" "18-25" "12-18" "10-15" "16-22" %} LPA</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block extra_css %}
+<style>
+.job-rec-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-xl);padding:var(--space-lg);transition:all var(--transition);}
+.job-rec-card:hover{border-color:var(--border-gold);box-shadow:var(--shadow-md);transform:translateY(-2px);}
+</style>
+{% endblock %}

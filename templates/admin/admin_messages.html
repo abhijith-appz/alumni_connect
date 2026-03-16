@@ -1,0 +1,96 @@
+{% extends "shared/dashboard_base.html" %}
+{% block page_title %}Message Center{% endblock %}
+{% block breadcrumb %}Admin / <span>Messages</span>{% endblock %}
+{% block sidebar_nav %}{% include "admin/partials/sidebar.html" %}{% endblock %}
+
+{% block dashboard_content %}
+<div style="display:grid;grid-template-columns:320px 1fr;gap:0;background:var(--white);border-radius:var(--radius-xl);border:1px solid var(--border);overflow:hidden;height:calc(100vh - 160px);">
+
+  <!-- Left: Message List -->
+  <div style="border-right:1px solid var(--border);display:flex;flex-direction:column;">
+    <div style="padding:var(--space-md);border-bottom:1px solid var(--border);">
+      <h5 style="margin-bottom:var(--space-sm);">Contact Messages</h5>
+      <div class="search-bar"><i class="fas fa-search search-icon" style="font-size:.85rem;"></i>
+        <input type="text" placeholder="Search…" oninput="document.querySelectorAll('.msg-item').forEach(i=>{i.style.display=(!this.value||i.dataset.name.includes(this.value.toLowerCase())||i.dataset.subject.includes(this.value.toLowerCase()))?'block':'none'})">
+      </div>
+    </div>
+    <div style="overflow-y:auto;flex:1;">
+      {% for msg in contact_messages %}
+      <a href="/staff/messages/?msg={{ msg.pk }}" class="msg-item {% if active_msg and msg.pk == active_msg.pk %}active{% endif %}" data-name="{{ msg.name|lower }}" data-subject="{{ msg.subject|lower }}" style="display:block;padding:12px var(--space-md);border-bottom:1px solid var(--border);text-decoration:none;{% if active_msg and msg.pk == active_msg.pk %}background:var(--gold-pale);border-left:3px solid var(--gold);{% elif not msg.is_read %}background:rgba(200,169,110,0.06);{% endif %}">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div class="avatar avatar-sm" style="background:var(--navy);flex-shrink:0;">{{ msg.name|first|upper }}</div>
+          <div style="flex:1;min-width:0;">
+            <div style="display:flex;justify-content:space-between;"><span style="font-weight:{% if not msg.is_read %}700{% else %}500{% endif %};font-size:.875rem;color:var(--navy);">{{ msg.name }}</span><span style="font-size:.7rem;color:var(--text-muted);">{{ msg.created_at|timesince|truncatewords:2 }}</span></div>
+            <div style="font-size:.775rem;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ msg.subject }}</div>
+            {% if msg.reply %}<div style="font-size:.7rem;color:var(--sage);"><i class="fas fa-check-circle"></i> Replied</div>{% endif %}
+          </div>
+          {% if not msg.is_read %}<div style="width:8px;height:8px;border-radius:50%;background:var(--gold);flex-shrink:0;"></div>{% endif %}
+        </div>
+      </a>
+      {% empty %}
+      <div style="padding:var(--space-xl);text-align:center;color:var(--text-muted);"><i class="fas fa-inbox" style="font-size:2rem;opacity:.3;display:block;margin-bottom:var(--space-md);"></i><p style="font-size:.875rem;">No messages yet.</p></div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Right: Message Detail -->
+  <div style="display:flex;flex-direction:column;">
+    {% if active_msg %}
+    <div style="padding:var(--space-md) var(--space-lg);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:var(--space-md);">
+      <div>
+        <h5 style="color:var(--navy);margin-bottom:4px;">{{ active_msg.subject }}</h5>
+        <span style="font-size:.8rem;color:var(--text-muted);">From: {{ active_msg.name }} &lt;{{ active_msg.email }}&gt;</span>
+      </div>
+      <div style="display:flex;gap:var(--space-sm);align-items:center;">
+        {% if active_msg.reply %}<span class="badge badge-green"><i class="fas fa-check-circle"></i> Replied</span>
+        {% else %}<span class="badge badge-gold">Open</span>{% endif %}
+        <form method="POST" action="/staff/messages/?msg={{ active_msg.pk }}" style="display:inline;">
+          {% csrf_token %}<input type="hidden" name="action" value="resolve">
+          <button type="submit" class="btn btn-outline btn-sm"><i class="fas fa-check"></i> Mark Resolved</button>
+        </form>
+      </div>
+    </div>
+    <div style="flex:1;overflow-y:auto;padding:var(--space-xl);">
+      <div class="card" style="margin-bottom:var(--space-lg);">
+        <div style="display:flex;align-items:center;gap:var(--space-md);margin-bottom:var(--space-md);">
+          <div class="avatar avatar-md" style="background:var(--navy);">{{ active_msg.name|first|upper }}</div>
+          <div>
+            <div style="font-weight:600;color:var(--navy);">{{ active_msg.name }}</div>
+            <div style="font-size:.775rem;color:var(--text-muted);">{{ active_msg.email }}{% if active_msg.user_type %} · {{ active_msg.user_type|title }}{% endif %} · {{ active_msg.created_at|date:"M d, Y g:i A" }}</div>
+          </div>
+        </div>
+        <p style="line-height:1.7;color:var(--text-secondary);">{{ active_msg.message }}</p>
+      </div>
+      {% if active_msg.reply %}
+      <div style="margin-bottom:var(--space-lg);">
+        <div style="font-size:.75rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted);margin-bottom:var(--space-md);">Your Reply — {{ active_msg.replied_at|date:"M d, Y g:i A" }}</div>
+        <div class="card" style="border-left:3px solid var(--sage);background:rgba(74,124,111,0.04);">
+          <div style="display:flex;align-items:center;gap:var(--space-md);margin-bottom:var(--space-md);">
+            <div class="avatar avatar-md" style="background:var(--sage);">AX</div>
+            <div><div style="font-weight:600;color:var(--navy);">Admin</div><div style="font-size:.775rem;color:var(--text-muted);">{{ active_msg.replied_at|date:"M d, Y g:i A" }}</div></div>
+          </div>
+          <p style="line-height:1.7;color:var(--text-secondary);">{{ active_msg.reply }}</p>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+    <div style="padding:var(--space-md) var(--space-lg);border-top:1px solid var(--border);">
+      <form method="POST" action="/staff/messages/?msg={{ active_msg.pk }}">
+        {% csrf_token %}
+        <div style="display:flex;gap:var(--space-sm);align-items:flex-end;">
+          <textarea name="reply" rows="2" class="form-textarea" placeholder="Type your reply… (Ctrl+Enter to send)" style="flex:1;resize:none;min-height:60px;max-height:150px;" onkeydown="if(event.ctrlKey&&event.key==='Enter'){event.preventDefault();this.closest('form').submit()}" oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,150)+'px'"></textarea>
+          <button type="submit" class="btn btn-gold" style="height:60px;padding:0 20px;"><i class="fas fa-paper-plane"></i> Send</button>
+        </div>
+        <p style="font-size:.7rem;color:var(--text-muted);margin-top:6px;"><kbd style="background:var(--ivory);border:1px solid var(--border);border-radius:3px;padding:1px 5px;font-size:.7rem;">Ctrl+Enter</kbd> to send quickly</p>
+      </form>
+    </div>
+    {% else %}
+    <div style="flex:1;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:var(--space-md);color:var(--text-muted);">
+      <i class="fas fa-envelope-open" style="font-size:4rem;opacity:.15;"></i>
+      <h4 style="color:var(--text-muted);font-weight:400;">No messages yet</h4>
+      <p style="font-size:.875rem;">Contact form submissions appear here.</p>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

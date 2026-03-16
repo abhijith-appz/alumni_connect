@@ -1,0 +1,57 @@
+{% extends "shared/dashboard_base.html" %}
+{% block page_title %}Career Guidance{% endblock %}
+{% block breadcrumb %}Home / <span>Career Guidance</span>{% endblock %}
+{% block sidebar_nav %}{% include "student/partials/sidebar.html" %}{% endblock %}
+
+{% block dashboard_content %}
+<div style="margin-bottom:var(--space-xl);">
+  <h3>Career Guidance</h3>
+  <p style="color:var(--text-muted);">Tips, advice, and resources from our alumni community</p>
+</div>
+<!-- AI Banner -->
+<div style="background:linear-gradient(135deg,var(--navy),var(--navy-light));border-radius:var(--radius-xl);padding:var(--space-xl);margin-bottom:var(--space-xl);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:var(--space-md);">
+  <div>
+    <span class="section-eyebrow" style="color:var(--gold-light);">AI-Powered</span>
+    <h3 style="color:var(--ivory);margin-bottom:8px;">Get Personalized Career Advice</h3>
+    <p style="color:rgba(245,240,232,0.7);">Our AI analyses your profile and recommends tailored career paths and skills.</p>
+  </div>
+  <a href="{% url 'ai_career_guidance' %}" class="btn btn-gold btn-lg"><i class="fas fa-robot"></i> AI Career Guide</a>
+</div>
+<!-- Tabs -->
+<div class="tabs">
+  <div class="tabs-list">
+    <button class="tab-item active" onclick="switchTab('articles',this)">Articles & Tips</button>
+    <button class="tab-item" onclick="switchTab('advice',this)">Alumni Advice</button>
+    <button class="tab-item" onclick="switchTab('resources',this)">Resources</button>
+  </div>
+</div>
+<div id="tab-articles">
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:var(--space-lg);">
+    {% for article in career_articles %}
+    <div class="card" style="display:flex;flex-direction:column;">
+      <div style="width:44px;height:44px;border-radius:var(--radius-md);background:var(--gold-pale);color:var(--gold);display:flex;align-items:center;justify-content:center;font-size:1.25rem;margin-bottom:var(--space-md);">{{ article.icon }}</div>
+      <h5 style="margin-bottom:8px;">{{ article.title }}</h5>
+      <p style="font-size:0.875rem;flex:1;">{{ article.excerpt }}</p>
+      <a href="{{ article.url }}" class="btn btn-ghost btn-sm" style="margin-top:var(--space-md);align-self:flex-start;">Read More <i class="fas fa-arrow-right"></i></a>
+    </div>
+    {% empty %}
+    {% for a in "123456" %}
+    <div class="card" style="display:flex;flex-direction:column;">
+      <div style="width:44px;height:44px;border-radius:var(--radius-md);background:var(--gold-pale);color:var(--gold);display:flex;align-items:center;justify-content:center;font-size:1.25rem;margin-bottom:var(--space-md);">{% cycle "🎯" "💼" "🚀" "📊" "🧠" "🤝" %}</div>
+      <h5 style="margin-bottom:8px;">{% if forloop.counter == 1 %}How to Crack Google's Interview{% elif forloop.counter == 2 %}Resume Tips from Alumni Hiring Managers{% elif forloop.counter == 3 %}From Campus to Corporate: A Roadmap{% elif forloop.counter == 4 %}Building a Personal Brand on LinkedIn{% elif forloop.counter == 5 %}Skills That Matter in 2024{% else %}Networking That Actually Works{% endif %}</h5>
+      <p style="font-size:0.875rem;flex:1;">{% if forloop.counter == 1 %}Insights from a Google senior engineer on how to prepare for technical rounds, behavioural interviews, and system design.{% elif forloop.counter == 2 %}What alumni who now work as HR managers at top firms look for when screening resumes.{% elif forloop.counter == 3 %}A comprehensive guide to transitioning from student life to your first professional role.{% elif forloop.counter == 4 %}Learn how to optimise your LinkedIn profile and attract recruiters and alumni.{% elif forloop.counter == 5 %}Technical and soft skills that are most in demand in today's job market.{% else %}Move beyond networking anxiety with practical advice from alumni who've been there.{% endif %}</p>
+      <a href="#" class="btn btn-ghost btn-sm" style="margin-top:var(--space-md);align-self:flex-start;">Read More <i class="fas fa-arrow-right"></i></a>
+    </div>
+    {% endfor %}
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>
+function switchTab(tab, btn) {
+  document.querySelectorAll('.tab-item').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+}
+</script>
+{% endblock %}

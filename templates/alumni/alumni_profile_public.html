@@ -1,0 +1,124 @@
+{% extends "shared/dashboard_base.html" %}
+{% block page_title %}Alumni Profile{% endblock %}
+{% block breadcrumb %}Alumni / <span>{{ alumni.user.get_full_name|default:"Profile" }}</span>{% endblock %}
+{% block sidebar_nav %}
+{% if user.is_alumni %}
+  {% include "alumni/partials/sidebar.html" %}
+{% else %}
+  {% include "student/partials/sidebar.html" %}
+{% endif %}
+{% endblock %}
+
+{% block dashboard_content %}
+<div style="display:grid;grid-template-columns:1fr 2fr;gap:var(--space-xl);">
+  <!-- Left: Profile Card -->
+  <div>
+    <div class="card" style="text-align:center;margin-bottom:var(--space-lg);">
+      <div class="avatar avatar-xl" style="margin:0 auto var(--space-lg);background:var(--navy);font-size:2.5rem;">
+        {% if alumni.photo %}<img src="{{ alumni.photo.url }}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">
+        {% else %}{{ alumni.user.first_name.0 }}{{ alumni.user.last_name.0 }}{% endif %}
+      </div>
+      <h3>{{ alumni.user.get_full_name|default:"Dr. Anil Kumar" }}</h3>
+      <p style="color:var(--text-secondary);margin-bottom:4px;">{{ alumni.current_position|default:"Senior Software Engineer" }}</p>
+      <p style="color:var(--text-muted);font-size:0.875rem;margin-bottom:var(--space-md);">
+        <i class="fas fa-building" style="font-size:0.75rem;"></i> {{ alumni.company|default:"Google" }}
+        &nbsp; <i class="fas fa-map-marker-alt" style="font-size:0.75rem;"></i> {{ alumni.location|default:"Bangalore, India" }}
+      </p>
+      <div style="display:flex;justify-content:center;gap:var(--space-sm);flex-wrap:wrap;margin-bottom:var(--space-lg);">
+        <span class="badge badge-navy">{{ alumni.department|default:"Computer Science" }}</span>
+        <span class="badge badge-gold">Class of {{ alumni.graduation_year|default:"2018" }}</span>
+        {% if alumni.is_mentor_available %}<span class="badge badge-sage"><i class="fas fa-circle" style="font-size:0.5rem;"></i> Open to Mentor</span>{% endif %}
+      </div>
+      <div style="display:flex;gap:var(--space-sm);">
+        <a href="{% url 'student_messages' %}?user={{ alumni.user.pk|default:1 }}" class="btn btn-gold btn-sm" style="flex:1;justify-content:center;"><i class="fas fa-comment"></i> Message</a>
+        {% if alumni.linkedin_url %}<a href="{{ alumni.linkedin_url }}" target="_blank" class="btn btn-outline btn-sm"><i class="fab fa-linkedin-in"></i></a>{% endif %}
+      </div>
+    </div>
+
+    <!-- Contact Info -->
+    <div class="card" style="margin-bottom:var(--space-lg);">
+      <h5 style="margin-bottom:var(--space-md);">Contact</h5>
+      {% if alumni.email_visible %}
+      <div style="display:flex;align-items:center;gap:8px;font-size:0.875rem;color:var(--text-secondary);margin-bottom:8px;">
+        <i class="fas fa-envelope" style="width:16px;color:var(--gold);"></i>
+        <a href="mailto:{{ alumni.user.email }}" style="color:var(--sage);">{{ alumni.user.email }}</a>
+      </div>
+      {% endif %}
+      {% if alumni.linkedin_url %}
+      <div style="display:flex;align-items:center;gap:8px;font-size:0.875rem;color:var(--text-secondary);">
+        <i class="fab fa-linkedin-in" style="width:16px;color:var(--gold);"></i>
+        <a href="{{ alumni.linkedin_url }}" target="_blank" style="color:var(--sage);">LinkedIn Profile</a>
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- Skills -->
+    <div class="card">
+      <h5 style="margin-bottom:var(--space-md);">Skills</h5>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;">
+        {% for skill in alumni.skills_list %}<span class="badge badge-navy">{{ skill }}</span>
+        {% empty %}
+        <span class="badge badge-navy">Python</span><span class="badge badge-navy">Django</span>
+        <span class="badge badge-navy">Machine Learning</span><span class="badge badge-navy">AWS</span>
+        <span class="badge badge-navy">System Design</span><span class="badge badge-navy">Leadership</span>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Right: Detailed Info -->
+  <div>
+    <!-- Bio -->
+    <div class="card" style="margin-bottom:var(--space-lg);">
+      <h4 style="margin-bottom:var(--space-md);">About</h4>
+      <p style="line-height:1.8;">{{ alumni.bio|default:"Passionate software engineer with 6+ years of experience building scalable systems at Google. Alumnus of Vast (Computer Science, 2018). I love mentoring students and helping them navigate their early careers in tech. Feel free to reach out!" }}</p>
+    </div>
+
+    <!-- Work Experience -->
+    <div class="card" style="margin-bottom:var(--space-lg);">
+      <h4 style="margin-bottom:var(--space-xl);">Work Experience</h4>
+      <div class="timeline">
+        {% for exp in alumni.experience_list %}
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-date">{{ exp.start_year }} – {{ exp.end_year|default:"Present" }}</div>
+          <div style="font-weight:600;color:var(--navy);margin-bottom:2px;">{{ exp.title }}</div>
+          <div style="font-size:0.875rem;color:var(--text-secondary);margin-bottom:4px;"><i class="fas fa-building" style="font-size:0.75rem;"></i> {{ exp.company }}</div>
+          <div class="timeline-content">{{ exp.description }}</div>
+        </div>
+        {% empty %}
+        <div class="timeline-item"><div class="timeline-dot"></div><div class="timeline-date">2020 – Present</div><div style="font-weight:600;color:var(--navy);margin-bottom:2px;">Senior Software Engineer</div><div style="font-size:0.875rem;color:var(--text-secondary);margin-bottom:4px;"><i class="fas fa-building" style="font-size:0.75rem;"></i> Google, Bangalore</div><div class="timeline-content">Working on distributed systems and infrastructure at scale. Leading a team of 6 engineers on the cloud storage platform.</div></div>
+        <div class="timeline-item"><div class="timeline-dot"></div><div class="timeline-date">2018 – 2020</div><div style="font-weight:600;color:var(--navy);margin-bottom:2px;">Software Engineer</div><div style="font-size:0.875rem;color:var(--text-secondary);margin-bottom:4px;"><i class="fas fa-building" style="font-size:0.75rem;"></i> Flipkart, Bangalore</div><div class="timeline-content">Built microservices for the payment platform handling millions of transactions per day.</div></div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Education -->
+    <div class="card" style="margin-bottom:var(--space-lg);">
+      <h4 style="margin-bottom:var(--space-md);">Education</h4>
+      <div style="display:flex;gap:var(--space-md);align-items:flex-start;">
+        <div style="width:42px;height:42px;border-radius:var(--radius-md);background:var(--gold-pale);color:var(--gold);display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;"><i class="fas fa-graduation-cap"></i></div>
+        <div>
+          <div style="font-weight:600;color:var(--navy);">B.Tech — Computer Science</div>
+          <div style="font-size:0.875rem;color:var(--text-secondary);">Vast</div>
+          <div style="font-size:0.8rem;color:var(--text-muted);">{{ alumni.graduation_year|default:"2018" }}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Jobs Posted -->
+    {% if alumni_jobs %}
+    <div class="card">
+      <h4 style="margin-bottom:var(--space-md);">Jobs Posted by This Alumni</h4>
+      {% for job in alumni_jobs %}
+      <a href="{% url 'job_detail' job.pk %}" style="display:flex;align-items:center;gap:var(--space-md);padding:var(--space-md);border:1px solid var(--border);border-radius:var(--radius-md);margin-bottom:var(--space-sm);transition:all var(--transition);" onmouseover="this.style.borderColor='var(--border-gold)'" onmouseout="this.style.borderColor='var(--border)'">
+        <div style="width:40px;height:40px;border-radius:var(--radius-md);background:var(--navy);color:var(--gold);font-family:var(--font-display);font-weight:700;font-size:1rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;">{{ job.company.0 }}</div>
+        <div style="flex:1;"><div style="font-weight:600;color:var(--navy);font-size:0.9rem;">{{ job.title }}</div><div style="font-size:0.8rem;color:var(--text-muted);">{{ job.company }} · {{ job.location }}</div></div>
+        <span class="badge badge-navy">{{ job.type }}</span>
+      </a>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

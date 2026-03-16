@@ -1,0 +1,50 @@
+{% extends "shared/dashboard_base.html" %}
+{% block page_title %}Events{% endblock %}
+{% block breadcrumb %}Alumni / <span>Events</span>{% endblock %}
+{% block sidebar_nav %}{% include "alumni/partials/sidebar.html" %}{% endblock %}
+{% block dashboard_content %}
+<div style="margin-bottom:var(--space-xl);"><h3>Upcoming Events</h3><p style="color:var(--text-muted);">Alumni events, webinars and reunions</p></div>
+<div class="tabs"><div class="tabs-list">
+  <button class="tab-item active" onclick="filterEvents('all',this)">All Events</button>
+  <button class="tab-item" onclick="filterEvents('online',this)">Online</button>
+  <button class="tab-item" onclick="filterEvents('on_campus',this)">On Campus</button>
+  <button class="tab-item" onclick="filterEvents('registered',this)">My Registrations</button>
+</div></div>
+<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:var(--space-lg);margin-top:var(--space-lg);" id="eventsGrid">
+{% for event in events %}
+<div class="event-card" data-type="{{ event.event_type }}" data-registered="{% if event.pk in my_registrations %}yes{% else %}no{% endif %}">
+  <div style="height:140px;background:linear-gradient(135deg,var(--navy),var(--navy-light));display:flex;align-items:center;justify-content:center;position:relative;">
+    <span style="font-size:2.5rem;">{% if event.event_type == 'online' %}💻{% else %}🏛️{% endif %}</span>
+    <span class="badge badge-gold" style="position:absolute;top:10px;right:10px;">{{ event.event_type|title }}</span>
+    {% if event.pk in my_registrations %}<span class="badge badge-green" style="position:absolute;top:10px;left:10px;">✓ Registered</span>{% endif %}
+  </div>
+  <div style="padding:var(--space-lg);">
+    <div style="font-size:0.775rem;font-weight:600;color:var(--gold);margin-bottom:6px;"><i class="fas fa-calendar"></i> {{ event.event_date|date:"M d, Y" }}</div>
+    <h4 style="margin-bottom:8px;">{{ event.title }}</h4>
+    <p style="font-size:0.875rem;color:var(--text-muted);margin-bottom:var(--space-md);">{{ event.description|truncatewords:15 }}</p>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-md);">
+      <span style="font-size:0.8rem;color:var(--text-muted);"><i class="fas fa-map-marker-alt"></i> {{ event.location|truncatechars:25 }}</span>
+      <span style="font-size:0.8rem;color:var(--text-muted);"><i class="fas fa-users"></i> {{ event.registered_count }}/{{ event.capacity }}</span>
+    </div>
+    {% if event.pk in my_registrations %}
+    <div class="btn" style="width:100%;justify-content:center;background:var(--sage);color:white;border:none;"><i class="fas fa-check-circle"></i> Registered</div>
+    {% else %}
+    <a href="{% url 'event_detail' event.pk %}" class="btn btn-gold" style="width:100%;justify-content:center;"><i class="fas fa-calendar-check"></i> View &amp; Register</a>
+    {% endif %}
+  </div>
+</div>
+{% empty %}
+<div style="grid-column:1/-1;text-align:center;padding:var(--space-3xl);background:var(--white);border-radius:var(--radius-xl);border:1px solid var(--border);">
+  <i class="fas fa-calendar-alt" style="font-size:3rem;opacity:0.2;display:block;margin-bottom:var(--space-md);"></i>
+  <h4>No Upcoming Events</h4><p style="color:var(--text-muted);">Check back soon.</p>
+</div>
+{% endfor %}
+</div>
+{% endblock %}
+{% block extra_css %}<style>
+.event-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-xl);overflow:hidden;transition:all var(--transition);}
+.event-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-md);border-color:var(--border-gold);}
+</style>{% endblock %}
+{% block extra_js %}<script>
+function filterEvents(type,btn){document.querySelectorAll('.tab-item').forEach(b=>b.classList.remove('active'));btn.classList.add('active');document.querySelectorAll('.event-card').forEach(c=>{if(type==='all')c.style.display='block';else if(type==='registered')c.style.display=c.dataset.registered==='yes'?'block':'none';else c.style.display=c.dataset.type===type?'block':'none';});}
+</script>{% endblock %}

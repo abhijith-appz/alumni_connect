@@ -1,0 +1,74 @@
+{% extends "shared/dashboard_base.html" %}
+{% block page_title %}AI Help Center{% endblock %}
+{% block breadcrumb %}AI Tools / <span>Help Center</span>{% endblock %}
+{% block sidebar_nav %}
+{% if user.is_student %}{% include "student/partials/sidebar.html" %}
+{% else %}{% include "alumni/partials/sidebar.html" %}{% endif %}
+{% endblock %}
+{% block dashboard_content %}
+<div class="ai-help-section">
+  <div style="text-align:center;margin-bottom:var(--space-2xl);">
+    <div style="font-size:3rem;margin-bottom:var(--space-md);">🤖</div>
+    <span class="section-eyebrow">AI Help Center</span>
+    <h2 style="margin-bottom:8px;">How Can We Help?</h2>
+    <p style="color:var(--text-muted);max-width:480px;margin:0 auto var(--space-xl);">Our AI can explain how to use any feature of AlumniConnect. Search or browse categories below.</p>
+    <div class="search-bar" style="max-width:480px;margin:0 auto;">
+      <i class="fas fa-search search-icon"></i>
+      <input type="text" placeholder="Search help topics…" id="helpSearch" oninput="searchHelp(this.value)">
+    </div>
+  </div>
+  <!-- Categories -->
+  <div class="help-category-grid">
+    {% for cat in help_categories %}
+    <div class="help-category-card" onclick="showCategory('{{ cat.id }}')">
+      <div class="help-category-icon">{{ cat.icon }}</div>
+      <h5>{{ cat.title }}</h5>
+      <p style="font-size:0.8125rem;color:var(--text-muted);margin-top:4px;">{{ cat.description }}</p>
+    </div>
+    {% empty %}
+    <div class="help-category-card"><div class="help-category-icon">🚀</div><h5>Getting Started</h5><p style="font-size:0.8125rem;color:var(--text-muted);margin-top:4px;">Get started with AlumniConnect</p></div>
+    <div class="help-category-card"><div class="help-category-icon">🔍</div><h5>Alumni Search</h5><p style="font-size:0.8125rem;color:var(--text-muted);margin-top:4px;">Find and connect with alumni</p></div>
+    <div class="help-category-card"><div class="help-category-icon">💼</div><h5>Jobs &amp; Internships</h5><p style="font-size:0.8125rem;color:var(--text-muted);margin-top:4px;">Browse and apply for opportunities</p></div>
+    <div class="help-category-card"><div class="help-category-icon">🧭</div><h5>Career Guidance</h5><p style="font-size:0.8125rem;color:var(--text-muted);margin-top:4px;">Plan your career path</p></div>
+    <div class="help-category-card"><div class="help-category-icon">📅</div><h5>Events</h5><p style="font-size:0.8125rem;color:var(--text-muted);margin-top:4px;">Discover and join events</p></div>
+    <div class="help-category-card"><div class="help-category-icon">💬</div><h5>Messages</h5><p style="font-size:0.8125rem;color:var(--text-muted);margin-top:4px;">Message alumni and students</p></div>
+    <div class="help-category-card"><div class="help-category-icon">🤖</div><h5>AI Tools</h5><p style="font-size:0.8125rem;color:var(--text-muted);margin-top:4px;">Use AI-powered features</p></div>
+    <div class="help-category-card"><div class="help-category-icon">⚙️</div><h5>Account Settings</h5><p style="font-size:0.8125rem;color:var(--text-muted);margin-top:4px;">Manage your account</p></div>
+    {% endfor %}
+  </div>
+  <!-- Popular Articles -->
+  <h4 style="margin-bottom:var(--space-lg);">Popular Help Articles</h4>
+  <div id="helpArticles">
+    {% for article in help_articles %}
+    <div class="help-article"><h5>{{ article.title }}</h5><p>{{ article.summary }}</p></div>
+    {% empty %}
+    <div class="help-article"><h5>How do I search for alumni by company?</h5><p>Use the Alumni Search page and filter by company name. You can also use the AI Alumni Finder for natural language searches.</p></div>
+    <div class="help-article"><h5>How do I apply for a job posted by an alumni?</h5><p>Open the job listing, scroll to the application form, fill in the details, and click Apply Now.</p></div>
+    <div class="help-article"><h5>How does the AI career guidance work?</h5><p>The AI analyses your profile, department, and interests to suggest tailored career paths and skill recommendations.</p></div>
+    <div class="help-article"><h5>How do I send a message to an alumni?</h5><p>Visit the alumni profile page and click the Message button. Your message will appear in their inbox.</p></div>
+    <div class="help-article"><h5>Can I register for events through the platform?</h5><p>Yes! Go to Events, find the event you want, and click Register. You will receive a confirmation.</p></div>
+    <div class="help-article"><h5>How do I update my profile?</h5><p>Go to Profile or Edit Profile in your dashboard. Update the fields and click Save Changes.</p></div>
+    <div class="help-article"><h5>How do I change my password?</h5><p>Go to Settings and find the Account and Security section to change your password.</p></div>
+    {% endfor %}
+  </div>
+  <!-- Still need help? -->
+  <div style="text-align:center;margin-top:var(--space-2xl);padding:var(--space-xl);background:var(--gold-pale);border-radius:var(--radius-xl);">
+    <h4>Still Need Help?</h4>
+    <p style="margin-bottom:var(--space-lg);">Chat with the AI assistant or contact our support team.</p>
+    <div style="display:flex;justify-content:center;gap:var(--space-md);flex-wrap:wrap;">
+      <a href="{% url 'ai_chat' %}" class="btn btn-gold"><i class="fas fa-robot"></i> Ask AI Assistant</a>
+      <a href="{% url 'contact' %}" class="btn btn-outline">Contact Support</a>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>
+function searchHelp(q) {
+  document.querySelectorAll('.help-article').forEach(a=>{
+    const text=a.textContent.toLowerCase();
+    a.style.display=(!q||text.includes(q.toLowerCase()))?'block':'none';
+  });
+}
+</script>
+{% endblock %}

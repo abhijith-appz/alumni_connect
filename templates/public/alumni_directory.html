@@ -1,0 +1,155 @@
+{% extends "shared/base.html" %}
+{% block title %}Alumni Directory — {% endblock %}
+
+{% block content %}
+<section style="background:linear-gradient(135deg,var(--navy),var(--navy-mid));padding:var(--space-2xl) 0;">
+  <div class="container">
+    <div class="d-flex justify-between align-center" style="flex-wrap:wrap;gap:var(--space-md);">
+      <div>
+        <span class="section-eyebrow" style="color:var(--gold-light);">Community</span>
+        <h1 style="color:var(--ivory);margin-bottom:6px;">Alumni Directory</h1>
+        <p style="color:rgba(245,240,232,0.65);">Explore our global community of {{ total_alumni|default:"12,000+" }} graduates</p>
+      </div>
+      {% if not user.is_authenticated %}
+      <a href="{% url 'login' %}" class="btn btn-gold">
+        <i class="fas fa-sign-in-alt"></i> Login for Full Access
+      </a>
+      {% endif %}
+    </div>
+    <!-- Search -->
+    <div style="display:flex;gap:var(--space-md);margin-top:var(--space-xl);flex-wrap:wrap;">
+      <div class="search-bar" style="flex:1;min-width:240px;background:rgba(255,255,255,0.1);border-color:rgba(200,169,110,0.3);">
+        <i class="fas fa-search search-icon" style="color:rgba(245,240,232,0.5);"></i>
+        <input type="text" placeholder="Search alumni by name or company…" name="q" value="{{ request.GET.q }}"
+          style="color:var(--ivory);background:transparent;" id="searchInput"
+          onkeypress="if(event.key==='Enter')doSearch()">
+      </div>
+      <select class="form-select" style="width:180px;background:rgba(255,255,255,0.1);border-color:rgba(200,169,110,0.3);color:var(--ivory);" name="dept" id="deptFilter" onchange="doSearch()">
+        <option value="">All Departments</option>
+        {% for dept in departments %}
+        <option value="{{ dept }}" {% if request.GET.dept == dept %}selected{% endif %}>{{ dept }}</option>
+        {% empty %}
+        <option value="cs">Computer Science</option>
+        <option value="mba">Management</option>
+        <option value="eng">Engineering</option>
+        <option value="law">Law</option>
+        {% endfor %}
+      </select>
+      <select class="form-select" style="width:160px;background:rgba(255,255,255,0.1);border-color:rgba(200,169,110,0.3);color:var(--ivory);" name="year" id="yearFilter" onchange="doSearch()">
+        <option value="">All Years</option>
+        {% for year in graduation_years %}
+        <option value="{{ year }}" {% if request.GET.year == year|stringformat:"s" %}selected{% endif %}>{{ year }}</option>
+        {% empty %}
+        <option value="2024">2024</option>
+        <option value="2023">2023</option>
+        <option value="2022">2022</option>
+        <option value="2021">2021</option>
+        <option value="2020">2020</option>
+        <option value="2019">2019</option>
+        <option value="2018">2018</option>
+        <option value="2015">2015</option>
+        <option value="2010">2010</option>
+        <option value="2005">2005</option>
+        {% endfor %}
+      </select>
+    </div>
+  </div>
+</section>
+
+<section style="padding:var(--space-2xl) 0;background:var(--ivory);">
+  <div class="container">
+    {% if not user.is_authenticated %}
+    <div class="alert alert-info" style="margin-bottom:var(--space-lg);">
+      <i class="fas fa-info-circle"></i>
+      <span>You're viewing limited alumni information. <a href="{% url 'login' %}" style="color:var(--sage);font-weight:600;">Login</a> or <a href="{% url 'register_student' %}" style="color:var(--sage);font-weight:600;">register</a> to see full profiles and contact alumni.</span>
+    </div>
+    {% endif %}
+
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-lg);">
+      <p style="color:var(--text-muted);font-size:0.875rem;">Showing {{ alumni.count|default:"48" }} results</p>
+      <div style="display:flex;gap:var(--space-sm);">
+        <button class="btn btn-ghost btn-sm" onclick="setView('grid')" id="viewGrid"><i class="fas fa-th"></i></button>
+        <button class="btn btn-ghost btn-sm" onclick="setView('list')" id="viewList"><i class="fas fa-list"></i></button>
+      </div>
+    </div>
+
+    <div id="alumniGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:var(--space-lg);">
+      {% for alumni in alumni_list %}
+      <div class="spotlight-card">
+        <div class="sc-top">
+          <div class="avatar avatar-lg" style="background:var(--navy);">{{ alumni.user.first_name.0 }}{{ alumni.user.last_name.0 }}</div>
+          <div>
+            <div class="sc-name">{{ alumni.user.get_full_name }}</div>
+            <div class="sc-role">{{ alumni.current_position }}</div>
+            <div class="sc-company"><i class="fas fa-building" style="font-size:0.7rem;"></i> {{ alumni.company }}</div>
+          </div>
+        </div>
+        <div class="sc-meta">
+          <span class="badge badge-navy">{{ alumni.department }}</span>
+          <span class="badge badge-gold">{{ alumni.graduation_year }}</span>
+        </div>
+        {% if user.is_authenticated %}
+        <a href="{% url 'alumni_profile_public' alumni.pk %}" class="btn btn-outline btn-sm" style="width:100%;justify-content:center;">View Profile</a>
+        {% else %}
+        <a href="{% url 'login' %}" class="btn btn-ghost btn-sm" style="width:100%;justify-content:center;color:var(--text-muted);">🔒 Login to View</a>
+        {% endif %}
+      </div>
+      {% empty %}
+      {% for i in "123456789012" %}
+      <div class="spotlight-card">
+        <div class="sc-top">
+          <div class="avatar avatar-lg" style="background:var(--navy);">{{ forloop.counter }}</div>
+          <div>
+            <div class="sc-name">Alumni {{ forloop.counter }}</div>
+            <div class="sc-role">Professional</div>
+            <div class="sc-company"><i class="fas fa-building" style="font-size:0.7rem;"></i> Company Name</div>
+          </div>
+        </div>
+        <div class="sc-meta">
+          <span class="badge badge-navy">Department</span>
+          <span class="badge badge-gold">20{{ forloop.counter0|add:10 }}</span>
+        </div>
+        <a href="#" class="btn btn-outline btn-sm" style="width:100%;justify-content:center;">View Profile</a>
+      </div>
+      {% endfor %}
+      {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    <div style="display:flex;justify-content:center;margin-top:var(--space-2xl);">
+      <div class="pagination">
+        {% if alumni.has_previous %}
+        <a href="?page={{ alumni.previous_page_number }}" class="page-btn"><i class="fas fa-chevron-left"></i></a>
+        {% endif %}
+        {% for num in alumni.paginator.page_range %}
+        <a href="?page={{ num }}" class="page-btn {% if alumni.number == num %}active{% endif %}">{{ num }}</a>
+        {% empty %}
+        <a href="#" class="page-btn active">1</a>
+        <a href="#" class="page-btn">2</a>
+        <a href="#" class="page-btn">3</a>
+        <a href="#" class="page-btn">…</a>
+        <a href="#" class="page-btn">12</a>
+        {% endfor %}
+        {% if alumni.has_next %}
+        <a href="?page={{ alumni.next_page_number }}" class="page-btn"><i class="fas fa-chevron-right"></i></a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+{% block extra_js %}
+<script>
+function doSearch() {
+  const q = document.getElementById('searchInput').value;
+  const dept = document.getElementById('deptFilter').value;
+  const year = document.getElementById('yearFilter').value;
+  window.location = '{% url "alumni_directory" %}?q='+q+'&dept='+dept+'&year='+year;
+}
+function setView(v) {
+  const grid = document.getElementById('alumniGrid');
+  if(v==='list') { grid.style.gridTemplateColumns='1fr'; }
+  else { grid.style.gridTemplateColumns='repeat(auto-fill,minmax(240px,1fr))'; }
+}
+</script>
+{% endblock %}

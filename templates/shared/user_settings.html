@@ -1,0 +1,103 @@
+{% extends "shared/dashboard_base.html" %}
+{% block page_title %}Settings{% endblock %}
+{% block breadcrumb %}Home / <span>Settings</span>{% endblock %}
+
+{% block sidebar_nav %}
+{% if user.is_student %}{% include "student/partials/sidebar.html" %}
+{% elif user.is_alumni %}{% include "alumni/partials/sidebar.html" %}
+{% else %}{% include "admin/partials/sidebar.html" %}{% endif %}
+{% endblock %}
+
+{% block dashboard_content %}
+<div style="display:grid;grid-template-columns:240px 1fr;gap:var(--space-xl);">
+  <!-- Settings Nav -->
+  <div>
+    <div class="card">
+      <nav style="display:flex;flex-direction:column;gap:2px;">
+        <a href="#profile" class="sidebar-link active" style="border-radius:var(--radius-md);"><span class="link-icon"><i class="fas fa-user"></i></span> Profile</a>
+        <a href="#account" class="sidebar-link" style="border-radius:var(--radius-md);"><span class="link-icon"><i class="fas fa-lock"></i></span> Account & Security</a>
+        <a href="#notifications" class="sidebar-link" style="border-radius:var(--radius-md);"><span class="link-icon"><i class="fas fa-bell"></i></span> Notifications</a>
+        <a href="#privacy" class="sidebar-link" style="border-radius:var(--radius-md);"><span class="link-icon"><i class="fas fa-shield-alt"></i></span> Privacy</a>
+        <hr class="divider" style="margin:var(--space-sm) 0;">
+        <a href="{% url 'logout' %}" class="sidebar-link" style="border-radius:var(--radius-md);color:rgba(176,58,46,0.8);"><span class="link-icon"><i class="fas fa-sign-out-alt"></i></span> Log Out</a>
+      </nav>
+    </div>
+  </div>
+
+  <!-- Settings Content -->
+  <div>
+    <!-- Profile Section -->
+    <div class="card card-gold-accent" style="margin-bottom:var(--space-lg);" id="profile">
+      <h4 style="margin-bottom:var(--space-xl);">Profile Information</h4>
+      <form method="POST" action="{% url 'user_settings' %}" enctype="multipart/form-data">
+        {% csrf_token %}<input type="hidden" name="section" value="profile">
+        <div style="display:flex;align-items:center;gap:var(--space-xl);margin-bottom:var(--space-xl);">
+          <div style="position:relative;">
+            <div class="avatar avatar-xl" style="background:var(--navy);">{{ user.first_name.0 }}{{ user.last_name.0 }}</div>
+            <label for="avatarUpload" style="position:absolute;bottom:0;right:0;width:32px;height:32px;border-radius:50%;background:var(--gold);color:var(--navy);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:0.8rem;border:2px solid white;"><i class="fas fa-camera"></i></label>
+            <input type="file" id="avatarUpload" name="photo" style="display:none;" accept="image/*">
+          </div>
+          <div>
+            <h5>{{ user.get_full_name }}</h5>
+            <p style="font-size:0.875rem;color:var(--text-muted);">{{ user.email }}</p>
+            <label for="avatarUpload" class="btn btn-outline btn-sm" style="margin-top:8px;cursor:pointer;">Change Photo</label>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-md);">
+          <div class="form-group"><label class="form-label">First Name</label><input type="text" name="first_name" class="form-input" value="{{ user.first_name }}"></div>
+          <div class="form-group"><label class="form-label">Last Name</label><input type="text" name="last_name" class="form-input" value="{{ user.last_name }}"></div>
+        </div>
+        <div class="form-group"><label class="form-label">Email</label><input type="email" name="email" class="form-input" value="{{ user.email }}"></div>
+        <div class="form-group"><label class="form-label">Phone</label><input type="tel" name="phone" class="form-input" value="{{ user.phone }}"></div>
+        <button type="submit" class="btn btn-gold"><i class="fas fa-save"></i> Save Changes</button>
+      </form>
+    </div>
+
+    <!-- Account & Security -->
+    <div class="card" style="margin-bottom:var(--space-lg);" id="account">
+      <h4 style="margin-bottom:var(--space-xl);">Account & Security</h4>
+      <form method="POST" action="{% url 'change_password' %}">
+        {% csrf_token %}
+        <div class="form-group"><label class="form-label">Current Password</label><input type="password" name="old_password" class="form-input" placeholder="Enter current password"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-md);">
+          <div class="form-group"><label class="form-label">New Password</label><input type="password" name="new_password1" class="form-input" placeholder="Min. 8 characters"></div>
+          <div class="form-group"><label class="form-label">Confirm New Password</label><input type="password" name="new_password2" class="form-input" placeholder="Repeat password"></div>
+        </div>
+        <button type="submit" class="btn btn-primary"><i class="fas fa-lock"></i> Change Password</button>
+      </form>
+    </div>
+
+    <!-- Notification Preferences -->
+    <div class="card" style="margin-bottom:var(--space-lg);" id="notifications">
+      <h4 style="margin-bottom:var(--space-xl);">Notification Preferences</h4>
+      <form method="POST" action="{% url 'user_settings' %}">
+        {% csrf_token %}<input type="hidden" name="section" value="notifications">
+        {% for pref in notification_prefs %}
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:var(--space-md) 0;border-bottom:1px solid var(--border);">
+          <div><div style="font-weight:500;color:var(--navy);font-size:0.9rem;">{{ pref.label }}</div><div style="font-size:0.8rem;color:var(--text-muted);">{{ pref.description }}</div></div>
+          <label style="position:relative;display:inline-block;width:42px;height:24px;">
+            <input type="checkbox" name="{{ pref.key }}" {% if pref.enabled %}checked{% endif %} style="opacity:0;width:0;height:0;">
+            <span style="position:absolute;cursor:pointer;inset:0;background:{% if pref.enabled %}var(--sage){% else %}var(--border){% endif %};border-radius:24px;transition:0.3s;"></span>
+          </label>
+        </div>
+        {% empty %}
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:var(--space-md) 0;border-bottom:1px solid var(--border);"><div><div style="font-weight:500;color:var(--navy);font-size:0.9rem;">New job postings</div></div><input type="checkbox" checked style="width:18px;height:18px;accent-color:var(--sage);cursor:pointer;"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:var(--space-md) 0;border-bottom:1px solid var(--border);"><div><div style="font-weight:500;color:var(--navy);font-size:0.9rem;">New messages</div></div><input type="checkbox" checked style="width:18px;height:18px;accent-color:var(--sage);cursor:pointer;"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:var(--space-md) 0;border-bottom:1px solid var(--border);"><div><div style="font-weight:500;color:var(--navy);font-size:0.9rem;">Event announcements</div></div><input type="checkbox" checked style="width:18px;height:18px;accent-color:var(--sage);cursor:pointer;"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:var(--space-md) 0;border-bottom:1px solid var(--border);"><div><div style="font-weight:500;color:var(--navy);font-size:0.9rem;">Alumni connections</div></div><input type="checkbox" checked style="width:18px;height:18px;accent-color:var(--sage);cursor:pointer;"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:var(--space-md) 0;border-bottom:1px solid var(--border);"><div><div style="font-weight:500;color:var(--navy);font-size:0.9rem;">AI recommendations</div></div><input type="checkbox" style="width:18px;height:18px;accent-color:var(--sage);cursor:pointer;"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:var(--space-md) 0;"><div><div style="font-weight:500;color:var(--navy);font-size:0.9rem;">System updates</div></div><input type="checkbox" style="width:18px;height:18px;accent-color:var(--sage);cursor:pointer;"></div>
+        {% endfor %}
+        <button type="submit" class="btn btn-gold" style="margin-top:var(--space-md);"><i class="fas fa-save"></i> Save Preferences</button>
+      </form>
+    </div>
+
+    <!-- Danger Zone -->
+    <div class="card" style="border-color:rgba(176,58,46,0.3);">
+      <h4 style="color:var(--crimson);margin-bottom:var(--space-md);">Danger Zone</h4>
+      <p style="font-size:0.875rem;color:var(--text-muted);margin-bottom:var(--space-md);">Deactivating your account will remove your profile from public view. This can be reversed by contacting admin.</p>
+      <button class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to deactivate your account?')"><i class="fas fa-user-times"></i> Deactivate Account</button>
+    </div>
+  </div>
+</div>
+{% endblock %}

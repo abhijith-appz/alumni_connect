@@ -1,0 +1,135 @@
+{% extends "shared/dashboard_base.html" %}
+{% block page_title %}Search Alumni{% endblock %}
+{% block breadcrumb %}Home / <span>Alumni Search</span>{% endblock %}
+{% block sidebar_nav %}{% include "student/partials/sidebar.html" %}{% endblock %}
+
+{% block dashboard_content %}
+<div style="margin-bottom:var(--space-xl);">
+  <h3>Find Alumni</h3>
+  <p style="color:var(--text-muted);">Search by department, graduation year, company, or skill</p>
+</div>
+
+<!-- Search & Filters -->
+<div class="card" style="margin-bottom:var(--space-xl);">
+  <div style="display:grid;grid-template-columns:1fr repeat(3,auto);gap:var(--space-md);align-items:flex-end;flex-wrap:wrap;">
+    <div>
+      <label class="form-label">Search Alumni</label>
+      <div class="search-bar">
+        <i class="fas fa-search search-icon" style="font-size:0.85rem;"></i>
+        <input type="text" placeholder="Name, company, skill, role…" id="alumniSearch" value="{{ request.GET.q }}">
+      </div>
+    </div>
+    <div>
+      <label class="form-label">Department</label>
+      <select class="form-select" id="deptFilter">
+        <option value="">All Departments</option>
+        {% for dept in departments %}<option value="{{ dept.id }}" {% if request.GET.dept == dept.id|stringformat:"s" %}selected{% endif %}>{{ dept.name }}</option>
+        {% empty %}
+        <option value="cs">Computer Science</option>
+        <option value="mba">Management</option>
+        <option value="eng">Engineering</option>
+        <option value="law">Law</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div>
+      <label class="form-label">Graduation Year</label>
+      <select class="form-select" id="yearFilter">
+        <option value="">All Years</option>
+        {% for year in years_range %}<option value="{{ year }}">{{ year }}</option>
+        {% empty %}
+        <option value="2024">2024</option>
+        <option value="2023">2023</option>
+        <option value="2022">2022</option>
+        <option value="2021">2021</option>
+        <option value="2020">2020</option>
+        <option value="2019">2019</option>
+        <option value="2018">2018</option>
+        <option value="2015">2015</option>
+        <option value="2010">2010</option>
+        <option value="2005">2005</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div>
+      <label class="form-label">Company</label>
+      <input type="text" id="companyFilter" class="form-input" placeholder="Google, TCS…" value="{{ request.GET.company }}">
+    </div>
+  </div>
+  <div style="display:flex;gap:var(--space-sm);margin-top:var(--space-md);">
+    <button class="btn btn-primary" onclick="doSearch()"><i class="fas fa-search"></i> Search</button>
+    <a href="{% url 'ai_alumni_finder' %}" class="btn btn-gold"><i class="fas fa-robot"></i> AI Alumni Finder</a>
+    <button class="btn btn-ghost" onclick="clearFilters()">Clear Filters</button>
+  </div>
+</div>
+
+<!-- Results count -->
+<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-md);">
+  <p style="font-size:0.875rem;color:var(--text-muted);"><strong style="color:var(--navy);">{{ alumni_count|default:248 }}</strong> alumni found</p>
+</div>
+
+<!-- Alumni Cards Grid -->
+<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:var(--space-lg);">
+  {% for alumni in alumni_list %}
+  <div class="alumni-card">
+    <div style="display:flex;align-items:center;gap:var(--space-md);margin-bottom:var(--space-md);">
+      <div class="avatar avatar-lg" style="background:var(--navy);">{{ alumni.user.first_name.0 }}{{ alumni.user.last_name.0 }}</div>
+      <div>
+        <div style="font-family:var(--font-display);font-weight:600;color:var(--navy);">{{ alumni.user.get_full_name }}</div>
+        <div style="font-size:0.8rem;color:var(--text-secondary);">{{ alumni.current_position }}</div>
+        <div style="font-size:0.775rem;color:var(--text-muted);"><i class="fas fa-building" style="font-size:0.7rem;"></i> {{ alumni.company }}</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:var(--space-md);">
+      <span class="badge badge-navy">{{ alumni.department }}</span>
+      <span class="badge badge-gold">{{ alumni.graduation_year }}</span>
+      {% if alumni.is_mentor_available %}<span class="badge badge-sage"><i class="fas fa-circle" style="font-size:0.5rem;"></i> Mentoring</span>{% endif %}
+    </div>
+    <div style="display:flex;gap:var(--space-sm);">
+      <a href="{% url 'alumni_profile_public' alumni.pk %}" class="btn btn-outline btn-sm" style="flex:1;justify-content:center;">View Profile</a>
+      <a href="{% url 'student_messages' %}?user={{ alumni.user.pk }}" class="btn btn-ghost btn-sm"><i class="fas fa-comment"></i></a>
+    </div>
+  </div>
+  {% empty %}
+  {% for i in "123456789012" %}
+  <div class="alumni-card">
+    <div style="display:flex;align-items:center;gap:var(--space-md);margin-bottom:var(--space-md);">
+      <div class="avatar avatar-lg" style="background:var(--navy);">{{ forloop.counter }}</div>
+      <div>
+        <div style="font-family:var(--font-display);font-weight:600;color:var(--navy);">Alumni {{ forloop.counter }}</div>
+        <div style="font-size:0.8rem;color:var(--text-secondary);">{% cycle "Software Engineer" "Product Manager" "Data Scientist" "UX Lead" "DevOps Engineer" "Business Analyst" "ML Engineer" "Cloud Architect" "QA Lead" "Frontend Dev" "Backend Dev" "Full Stack" %}</div>
+        <div style="font-size:0.775rem;color:var(--text-muted);"><i class="fas fa-building" style="font-size:0.7rem;"></i> {% cycle "Google" "Microsoft" "Amazon" "Adobe" "Flipkart" "IBM" "Wipro" "TCS" "Infosys" "Zerodha" "CRED" "Razorpay" %}</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:var(--space-md);">
+      <span class="badge badge-navy">{% cycle "CS" "MBA" "ECE" "Mech" "Civil" "Finance" %}</span>
+      <span class="badge badge-gold">20{% cycle "18" "19" "20" "21" "15" "17" %}</span>
+      {% if forloop.counter|divisibleby:3 %}<span class="badge badge-sage"><i class="fas fa-circle" style="font-size:0.5rem;"></i> Mentoring</span>{% endif %}
+    </div>
+    <div style="display:flex;gap:var(--space-sm);">
+      <a href="#" class="btn btn-outline btn-sm" style="flex:1;justify-content:center;">View Profile</a>
+      <a href="#" class="btn btn-ghost btn-sm"><i class="fas fa-comment"></i></a>
+    </div>
+  </div>
+  {% endfor %}
+  {% endfor %}
+</div>
+{% endblock %}
+{% block extra_css %}
+<style>
+.alumni-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-xl);padding:var(--space-lg);transition:all var(--transition);}
+.alumni-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-md);border-color:var(--border-gold);}
+</style>
+{% endblock %}
+{% block extra_js %}
+<script>
+function doSearch(){
+  const q=document.getElementById('alumniSearch').value;
+  const dept=document.getElementById('deptFilter').value;
+  const year=document.getElementById('yearFilter').value;
+  const company=document.getElementById('companyFilter').value;
+  window.location='{% url "alumni_search" %}?q='+q+'&dept='+dept+'&year='+year+'&company='+company;
+}
+function clearFilters(){window.location='{% url "alumni_search" %}';}
+</script>
+{% endblock %}

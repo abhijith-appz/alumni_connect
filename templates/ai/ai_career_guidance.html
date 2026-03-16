@@ -1,0 +1,90 @@
+{% extends "shared/dashboard_base.html" %}
+{% block page_title %}AI Career Guidance{% endblock %}
+{% block breadcrumb %}AI Tools / <span>Career Guidance</span>{% endblock %}
+{% block sidebar_nav %}{% include "student/partials/sidebar.html" %}{% endblock %}
+
+{% block dashboard_content %}
+<!-- Hero -->
+<div style="background:linear-gradient(135deg,var(--navy),var(--navy-light));border-radius:var(--radius-xl);padding:var(--space-xl);margin-bottom:var(--space-xl);text-align:center;position:relative;overflow:hidden;">
+  <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(200,169,110,0.05) 1px,transparent 1px),linear-gradient(90deg,rgba(200,169,110,0.05) 1px,transparent 1px);background-size:30px 30px;"></div>
+  <div style="position:relative;z-index:1;">
+    <div style="font-size:2.5rem;margin-bottom:var(--space-md);">🧭</div>
+    <span class="section-eyebrow" style="color:var(--gold-light);">AI-Powered</span>
+    <h2 style="color:var(--ivory);margin-bottom:8px;">Personalised Career Guidance</h2>
+    <p style="color:rgba(245,240,232,0.7);max-width:500px;margin:0 auto;">Based on your profile, department, and interests, our AI maps the best career paths and skills for you.</p>
+  </div>
+</div>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-xl);">
+  <!-- Career Paths -->
+  <div>
+    <div class="card card-gold-accent" style="margin-bottom:var(--space-lg);">
+      <h4 style="margin-bottom:var(--space-lg);"><i class="fas fa-road" style="color:var(--gold);margin-right:8px;"></i>Suggested Career Paths</h4>
+      {% for path in career_paths %}
+      <div style="padding:var(--space-md);border:1px solid var(--border);border-radius:var(--radius-lg);margin-bottom:var(--space-md);cursor:pointer;transition:all var(--transition);" onmouseover="this.style.borderColor='var(--border-gold)'" onmouseout="this.style.borderColor='var(--border)'">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+          <span style="font-weight:600;color:var(--navy);">{{ path.title }}</span>
+          <span class="badge badge-gold">{{ path.match_score }}% match</span>
+        </div>
+        <div style="background:var(--border);border-radius:var(--radius-full);height:6px;overflow:hidden;margin-bottom:8px;"><div style="width:{{ path.match_score }}%;height:100%;background:linear-gradient(90deg,var(--gold),var(--sage-light));border-radius:var(--radius-full);"></div></div>
+        <p style="font-size:0.8125rem;color:var(--text-muted);">{{ path.description }}</p>
+      </div>
+      {% empty %}
+      {% for p in "123" %}
+      <div style="padding:var(--space-md);border:1px solid var(--border);border-radius:var(--radius-lg);margin-bottom:var(--space-md);">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+          <span style="font-weight:600;color:var(--navy);">{% if forloop.counter == 1 %}Software Engineering{% elif forloop.counter == 2 %}Data Science & ML{% else %}Product Management{% endif %}</span>
+          <span class="badge badge-gold">{% if forloop.counter == 1 %}94{% elif forloop.counter == 2 %}87{% else %}76{% endif %}% match</span>
+        </div>
+        <div style="background:var(--border);border-radius:var(--radius-full);height:6px;overflow:hidden;margin-bottom:8px;"><div style="width:{% if forloop.counter == 1 %}94{% elif forloop.counter == 2 %}87{% else %}76{% endif %}%;height:100%;background:linear-gradient(90deg,var(--gold),var(--sage-light));border-radius:var(--radius-full);"></div></div>
+        <p style="font-size:0.8125rem;color:var(--text-muted);">{% if forloop.counter == 1 %}Your strong programming skills and CS background make this an excellent fit.{% elif forloop.counter == 2 %}With your analytical mindset and interest in Python, data science roles align well.{% else %}Your leadership qualities and technical background suit PM roles at tech companies.{% endif %}</p>
+      </div>
+      {% endfor %}
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Skill Recommendations -->
+  <div>
+    <div class="card card-gold-accent" style="margin-bottom:var(--space-lg);">
+      <h4 style="margin-bottom:var(--space-lg);"><i class="fas fa-dumbbell" style="color:var(--gold);margin-right:8px;"></i>Skills to Develop</h4>
+      {% for skill in recommended_skills %}
+      <div style="display:flex;align-items:center;gap:var(--space-md);padding:10px 0;border-bottom:1px solid var(--border);">
+        <div style="width:36px;height:36px;border-radius:var(--radius-md);background:{{ skill.bg_color|default:'var(--gold-pale)' }};color:{{ skill.color|default:'var(--gold)' }};display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;">{{ skill.icon|default:"⚡" }}</div>
+        <div style="flex:1;"><div style="font-weight:600;font-size:0.9rem;color:var(--navy);">{{ skill.name }}</div><div style="font-size:0.775rem;color:var(--text-muted);">{{ skill.reason }}</div></div>
+        <span class="badge {% if skill.priority == 'High' %}badge-red{% elif skill.priority == 'Medium' %}badge-gold{% else %}badge-sage{% endif %}">{{ skill.priority }}</span>
+      </div>
+      {% empty %}
+      {% for s in "12345" %}
+      <div style="display:flex;align-items:center;gap:var(--space-md);padding:10px 0;border-bottom:1px solid var(--border);">
+        <div style="width:36px;height:36px;border-radius:var(--radius-md);background:var(--gold-pale);color:var(--gold);display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;">{% cycle "⚡" "☁️" "🐍" "📊" "🎨" %}</div>
+        <div style="flex:1;"><div style="font-weight:600;font-size:0.9rem;color:var(--navy);">{% if forloop.counter == 1 %}System Design{% elif forloop.counter == 2 %}AWS / Cloud{% elif forloop.counter == 3 %}Python (Advanced){% elif forloop.counter == 4 %}SQL & Data Analysis{% else %}Communication{% endif %}</div><div style="font-size:0.775rem;color:var(--text-muted);">{% if forloop.counter == 1 %}Required for senior roles{% elif forloop.counter == 2 %}90% of tech jobs list this{% elif forloop.counter == 3 %}Your current level is intermediate{% elif forloop.counter == 4 %}Critical for data roles{% else %}Most overlooked skill{% endif %}</div></div>
+        <span class="badge {% if forloop.counter <= 2 %}badge-red{% elif forloop.counter == 3 %}badge-gold{% else %}badge-sage{% endif %}">{% if forloop.counter <= 2 %}High{% elif forloop.counter == 3 %}Medium{% else %}Low{% endif %}</span>
+      </div>
+      {% endfor %}
+      {% endfor %}
+    </div>
+
+    <!-- Alumni in This Field -->
+    <div class="card">
+      <h4 style="margin-bottom:var(--space-md);"><i class="fas fa-user-friends" style="color:var(--gold);margin-right:8px;"></i>Alumni in Your Field</h4>
+      {% for alumni in field_alumni %}
+      <div style="display:flex;align-items:center;gap:var(--space-md);padding:10px 0;border-bottom:1px solid var(--border);">
+        <div class="avatar avatar-md" style="background:var(--navy);">{{ alumni.user.first_name.0 }}</div>
+        <div style="flex:1;"><div style="font-weight:600;font-size:0.9rem;color:var(--navy);">{{ alumni.user.get_full_name }}</div><div style="font-size:0.775rem;color:var(--text-muted);">{{ alumni.current_position }} @ {{ alumni.company }}</div></div>
+        <a href="{% url 'alumni_profile_public' alumni.pk %}" class="btn btn-outline btn-sm">View</a>
+      </div>
+      {% empty %}
+      {% for a in "123" %}
+      <div style="display:flex;align-items:center;gap:var(--space-md);padding:10px 0;border-bottom:1px solid var(--border);">
+        <div class="avatar avatar-md" style="background:var(--navy);">{% cycle "AK" "SR" "MP" %}</div>
+        <div style="flex:1;"><div style="font-weight:600;font-size:0.9rem;color:var(--navy);">{% cycle "Anil Kumar" "Sunita Rao" "Mohan Pillai" %}</div><div style="font-size:0.775rem;color:var(--text-muted);">{% cycle "Senior Engineer @ Google" "ML Scientist @ Amazon" "Product Manager @ Flipkart" %}</div></div>
+        <a href="#" class="btn btn-outline btn-sm">View</a>
+      </div>
+      {% endfor %}
+      {% endfor %}
+      <a href="{% url 'ai_alumni_finder' %}" class="btn btn-gold btn-sm" style="width:100%;justify-content:center;margin-top:var(--space-md);">Find More Alumni</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

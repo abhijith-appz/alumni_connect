@@ -1,0 +1,58 @@
+{% extends "shared/dashboard_base.html" %}
+{% block page_title %}Manage Jobs{% endblock %}
+{% block breadcrumb %}Admin / <span>Jobs</span>{% endblock %}
+{% block sidebar_nav %}{% include "admin/partials/sidebar.html" %}{% endblock %}
+{% block dashboard_content %}
+<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-xl);flex-wrap:wrap;gap:var(--space-md);">
+  <div><h3>Manage Job Posts</h3><p style="color:var(--text-muted);">Monitor and moderate all job postings</p></div>
+  <a href="{% url 'system_reports' %}#jobs" class="btn btn-outline"><i class="fas fa-chart-bar"></i> Job Analytics</a>
+</div>
+<div class="card" style="margin-bottom:var(--space-lg);">
+  <div style="display:flex;gap:var(--space-md);flex-wrap:wrap;align-items:flex-end;">
+    <div style="flex:1;min-width:200px;"><div class="search-bar"><i class="fas fa-search search-icon" style="font-size:0.85rem;"></i><input type="text" placeholder="Search jobs…"></div></div>
+    <select class="form-select" style="width:140px;"><option>All Types</option><option>Full Time</option><option>Internship</option><option>Part Time</option><option>Remote</option></select>
+    <select class="form-select" style="width:130px;"><option>All Status</option><option>Active</option><option>Closed</option><option>Flagged</option></select>
+    <button class="btn btn-primary"><i class="fas fa-filter"></i> Filter</button>
+  </div>
+</div>
+<div class="card">
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Job</th><th>Posted By</th><th>Type</th><th>Applications</th><th>Status</th><th>Posted</th><th>Actions</th></tr></thead>
+      <tbody>
+        {% for job in jobs %}
+        <tr>
+          <td><div style="font-weight:500;color:var(--navy);">{{ job.title }}</div><div style="font-size:0.75rem;color:var(--text-muted);">{{ job.company }} · {{ job.location }}</div></td>
+          <td><div style="font-size:0.875rem;">{{ job.posted_by.get_full_name }}</div></td>
+          <td><span class="badge {% if job.type == 'Full Time' %}badge-navy{% else %}badge-gold{% endif %}">{{ job.type }}</span></td>
+          <td>{{ job.applications_count }}</td>
+          <td><span class="badge {% if job.is_active %}badge-green{% else %}badge-navy{% endif %}">{% if job.is_active %}Active{% else %}Closed{% endif %}</span></td>
+          <td style="font-size:0.8125rem;">{{ job.created_at|timesince }} ago</td>
+          <td><div style="display:flex;gap:4px;"><a href="{% url 'job_detail' job.pk %}" class="btn btn-ghost btn-sm"><i class="fas fa-eye"></i></a><form method="POST" action="{% url 'admin_delete_job' job.pk %}" onsubmit="return confirm('Remove this job?')">{% csrf_token %}<button type="submit" class="btn btn-ghost btn-sm" style="color:var(--crimson);"><i class="fas fa-trash"></i></button></form></div></td>
+        </tr>
+        {% empty %}
+        {% for i in "12345678" %}
+        <tr>
+          <td><div style="font-weight:500;color:var(--navy);">{% cycle "Software Engineer" "Product Manager" "Data Scientist" "UX Designer" "ML Engineer" "DevOps Lead" "Backend Dev" "Business Analyst" %}</div><div style="font-size:0.75rem;color:var(--text-muted);">{% cycle "Google" "Microsoft" "Amazon" "Adobe" "Tesla" "Flipkart" "Razorpay" "Deloitte" %} · {% cycle "Bangalore" "Mumbai" "Remote" "Hyderabad" %}</div></td>
+          <td><div style="font-size:0.875rem;">{% cycle "Anil Kumar" "Sunita Rao" "Mohan P." "Riya N." "Priya T." "Dev V." "Raj M." "Nita S." %}</div></td>
+          <td><span class="badge {% cycle 'badge-navy' 'badge-navy' 'badge-navy' 'badge-gold' 'badge-navy' 'badge-gold' 'badge-navy' 'badge-navy' %}">{% cycle "Full Time" "Full Time" "Full Time" "Internship" "Full Time" "Part Time" "Full Time" "Full Time" %}</span></td>
+          <td>{% cycle "24" "18" "31" "12" "8" "45" "19" "7" %}</td>
+          <td><span class="badge badge-green">Active</span></td>
+          <td style="font-size:0.8125rem;">{{ forloop.counter }} days ago</td>
+          <td><div style="display:flex;gap:4px;"><button class="btn btn-ghost btn-sm"><i class="fas fa-eye"></i></button><button class="btn btn-ghost btn-sm" style="color:var(--crimson);"><i class="fas fa-trash"></i></button></div></td>
+        </tr>
+        {% endfor %}
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <div style="display:flex;align-items:center;justify-content:space-between;padding-top:var(--space-md);border-top:1px solid var(--border);flex-wrap:wrap;gap:var(--space-md);">
+    <p style="font-size:0.8125rem;color:var(--text-muted);">Showing 1–25 of {{ total_jobs|default:287 }}</p>
+    <div class="pagination">
+      <a href="#" class="page-btn"><i class="fas fa-chevron-left"></i></a>
+      <a href="#" class="page-btn active">1</a><a href="#" class="page-btn">2</a><a href="#" class="page-btn">3</a><a href="#" class="page-btn">…</a><a href="#" class="page-btn">12</a>
+      <a href="#" class="page-btn"><i class="fas fa-chevron-right"></i></a>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,93 @@
+{% extends "shared/dashboard_base.html" %}
+{% block page_title %}AI Alumni Finder{% endblock %}
+{% block breadcrumb %}AI Tools / <span>Alumni Finder</span>{% endblock %}
+{% block sidebar_nav %}{% include "student/partials/sidebar.html" %}{% endblock %}
+
+{% block dashboard_content %}
+<div style="max-width:800px;margin:0 auto;">
+  <div style="text-align:center;margin-bottom:var(--space-2xl);">
+    <div style="font-size:3rem;margin-bottom:var(--space-md);">🔍</div>
+    <span class="section-eyebrow">AI-Powered Search</span>
+    <h2 style="margin-bottom:8px;">Find Alumni with AI</h2>
+    <p style="color:var(--text-muted);max-width:480px;margin:0 auto;">Describe what you're looking for in natural language — our AI will find the most relevant alumni for you.</p>
+  </div>
+
+  <!-- Natural Language Search -->
+  <div class="card card-gold-accent" style="margin-bottom:var(--space-xl);">
+    <form method="POST" action="{% url 'ai_alumni_finder' %}" id="aiSearchForm">
+      {% csrf_token %}
+      <div class="form-group">
+        <label class="form-label">Describe who you're looking for</label>
+        <textarea name="query" class="form-textarea" rows="3" id="aiQuery"
+          placeholder="e.g. 'Alumni working in machine learning at top tech companies who are willing to mentor students'&#10;or 'Xavier's graduates in investment banking in Mumbai'&#10;or 'Alumni with startup experience in EdTech or FinTech'">{{ request.POST.query }}</textarea>
+      </div>
+      <div style="display:flex;gap:var(--space-md);flex-wrap:wrap;">
+        <button type="submit" class="btn btn-gold btn-lg"><i class="fas fa-robot"></i> Search with AI</button>
+        <button type="button" class="btn btn-ghost" onclick="clearSearch()">Clear</button>
+      </div>
+    </form>
+
+    <!-- Example queries -->
+    <div style="margin-top:var(--space-lg);">
+      <p style="font-size:0.75rem;color:var(--text-muted);font-weight:500;margin-bottom:8px;">TRY THESE:</p>
+      <div style="display:flex;gap:var(--space-sm);flex-wrap:wrap;">
+        {% for example in example_queries %}
+        <button class="btn btn-ghost btn-sm" onclick="setQuery('{{ example }}')">{{ example }}</button>
+        {% empty %}
+        <button class="btn btn-ghost btn-sm" onclick="setQuery('Alumni at Google in India open to mentoring')">Alumni at Google open to mentoring</button>
+        <button class="btn btn-ghost btn-sm" onclick="setQuery('Data scientists with 5+ years of experience')">Data scientists, 5+ years</button>
+        <button class="btn btn-ghost btn-sm" onclick="setQuery('Startup founders from St. Xavier\'s')">Startup founders</button>
+        <button class="btn btn-ghost btn-sm" onclick="setQuery('Finance alumni in investment banking')">Finance & banking</button>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <!-- AI Results -->
+  {% if ai_results %}
+  <div>
+    <div style="display:flex;align-items:center;gap:var(--space-sm);margin-bottom:var(--space-lg);">
+      <i class="fas fa-robot" style="color:var(--gold);"></i>
+      <p style="font-size:0.875rem;color:var(--text-muted);">AI found <strong style="color:var(--navy);">{{ ai_results|length }}</strong> alumni matching your query</p>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:var(--space-md);">
+      {% for alumni in ai_results %}
+      <div class="card" style="display:flex;align-items:flex-start;gap:var(--space-lg);">
+        <div class="avatar avatar-lg" style="background:var(--navy);flex-shrink:0;">{{ alumni.user.first_name.0 }}{{ alumni.user.last_name.0 }}</div>
+        <div style="flex:1;">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:var(--space-sm);">
+            <div>
+              <div style="font-family:var(--font-display);font-weight:600;font-size:1.1rem;color:var(--navy);">{{ alumni.user.get_full_name }}</div>
+              <div style="font-size:0.875rem;color:var(--text-secondary);">{{ alumni.current_position }} @ {{ alumni.company }}</div>
+            </div>
+            <span class="badge badge-gold">{{ alumni.ai_match_score|default:92 }}% match</span>
+          </div>
+          <p style="font-size:0.8125rem;color:var(--text-muted);margin-top:6px;">{{ alumni.ai_reason }}</p>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:var(--space-sm);">
+            <span class="badge badge-navy">{{ alumni.department }}</span>
+            <span class="badge badge-gold">{{ alumni.graduation_year }}</span>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:var(--space-sm);flex-shrink:0;">
+          <a href="{% url 'alumni_profile_public' alumni.pk %}" class="btn btn-outline btn-sm">View Profile</a>
+          <a href="{% url 'student_messages' %}?user={{ alumni.user.pk }}" class="btn btn-ghost btn-sm"><i class="fas fa-comment"></i> Message</a>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% elif request.POST.query %}
+  <div style="text-align:center;padding:var(--space-2xl);background:var(--white);border-radius:var(--radius-xl);border:1px solid var(--border);">
+    <div style="font-size:2.5rem;margin-bottom:var(--space-md);">🤔</div>
+    <h4>No alumni found</h4>
+    <p style="color:var(--text-muted);">Try rephrasing your search or use the <a href="{% url 'alumni_search' %}" style="color:var(--gold);">standard alumni search</a> for more options.</p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>
+function setQuery(q){document.getElementById('aiQuery').value=q;}
+function clearSearch(){document.getElementById('aiQuery').value='';document.getElementById('aiSearchForm').reset();}
+</script>
+{% endblock %}

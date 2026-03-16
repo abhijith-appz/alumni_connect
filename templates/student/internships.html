@@ -1,0 +1,70 @@
+{% extends "shared/dashboard_base.html" %}
+{% block page_title %}Internship Opportunities{% endblock %}
+{% block breadcrumb %}Home / <span>Internships</span>{% endblock %}
+{% block sidebar_nav %}{% include "student/partials/sidebar.html" %}{% endblock %}
+{% block dashboard_content %}
+<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-xl);flex-wrap:wrap;gap:var(--space-md);">
+  <div><h3>Internship Opportunities</h3><p style="color:var(--text-muted);">Internships posted by St. Xavier's alumni</p></div>
+  <a href="{% url 'ai_job_recommendations' %}?type=internship" class="btn btn-gold"><i class="fas fa-robot"></i> AI Match</a>
+</div>
+<!-- Filter Chips -->
+<div class="internship-filter-chips">
+  <button class="filter-chip active" onclick="filterType('all',this)">All</button>
+  <button class="filter-chip" onclick="filterType('tech',this)">Technology</button>
+  <button class="filter-chip" onclick="filterType('finance',this)">Finance</button>
+  <button class="filter-chip" onclick="filterType('marketing',this)">Marketing</button>
+  <button class="filter-chip" onclick="filterType('design',this)">Design</button>
+  <button class="filter-chip" onclick="filterType('research',this)">Research</button>
+  <button class="filter-chip" onclick="filterType('remote',this)">Remote</button>
+</div>
+<div style="display:flex;flex-direction:column;gap:var(--space-md);" id="internshipList">
+  {% for job in internships %}
+  <a href="{% url 'job_detail' job.pk %}" class="internship-card" data-type="{{ job.domain }}">
+    <div class="internship-logo">{{ job.company.0 }}</div>
+    <div style="flex:1;">
+      <div style="font-weight:600;color:var(--navy);font-size:1rem;">{{ job.title }}</div>
+      <div style="font-size:0.875rem;color:var(--text-secondary);">{{ job.company }} · {{ job.location }}</div>
+      <div style="display:flex;gap:var(--space-md);margin-top:6px;flex-wrap:wrap;">
+        <span style="font-size:0.8rem;color:var(--text-muted);"><i class="fas fa-clock"></i> {{ job.duration }}</span>
+        {% if job.stipend %}<span style="font-size:0.8rem;color:var(--sage);font-weight:500;"><i class="fas fa-rupee-sign"></i> {{ job.stipend }}</span>{% endif %}
+        <span style="font-size:0.8rem;color:var(--text-muted);"><i class="fas fa-calendar"></i> Deadline: {{ job.deadline }}</span>
+      </div>
+    </div>
+    <div style="flex-shrink:0;text-align:right;">
+      <span class="badge badge-gold">Internship</span>
+      <div style="font-size:0.75rem;color:var(--text-muted);margin-top:4px;">{{ job.created_at|timesince }} ago</div>
+    </div>
+  </a>
+  {% empty %}
+  {% for i in "123456789" %}
+  <div class="internship-card" data-type="{% cycle 'tech' 'finance' 'design' 'tech' 'marketing' 'research' 'tech' 'remote' 'design' %}">
+    <div class="internship-logo">{% cycle "G" "M" "A" "F" "I" "Z" "S" "T" "D" %}</div>
+    <div style="flex:1;">
+      <div style="font-weight:600;color:var(--navy);font-size:1rem;">{% cycle "Software Development Intern" "Financial Analyst Intern" "UI/UX Design Intern" "ML Research Intern" "Digital Marketing Intern" "Data Science Intern" "Backend Engineering Intern" "Product Management Intern" "Frontend Dev Intern" %}</div>
+      <div style="font-size:0.875rem;color:var(--text-secondary);">{% cycle "Google" "HDFC" "Adobe" "Facebook" "Swiggy" "Zerodha" "Razorpay" "Ola" "Dunzo" %} · {% cycle "Bangalore" "Mumbai" "Pune" "Remote" "Hyderabad" %}</div>
+      <div style="display:flex;gap:var(--space-md);margin-top:6px;flex-wrap:wrap;">
+        <span style="font-size:0.8rem;color:var(--text-muted);"><i class="fas fa-clock"></i> {% cycle "2 months" "3 months" "6 months" "4 months" %}</span>
+        <span style="font-size:0.8rem;color:var(--sage);font-weight:500;"><i class="fas fa-rupee-sign"></i> {% cycle "20,000/mo" "15,000/mo" "25,000/mo" "18,000/mo" %}</span>
+        <span style="font-size:0.8rem;color:var(--text-muted);"><i class="fas fa-calendar"></i> Deadline: Aug 30</span>
+      </div>
+    </div>
+    <div style="flex-shrink:0;text-align:right;"><span class="badge badge-gold">Internship</span><div style="font-size:0.75rem;color:var(--text-muted);margin-top:4px;">{{ forloop.counter }} days ago</div></div>
+  </div>
+  {% endfor %}
+  {% endfor %}
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>
+function filterType(type, btn) {
+  document.querySelectorAll('.filter-chip').forEach(c=>c.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('#internshipList > *').forEach(card=>{
+    card.style.display=(type==='all'||card.dataset.type===type)?'flex':'none';
+  });
+}
+</script>
+{% endblock %}
+
+
+{# ======== admin/manage_events.html ======== #}

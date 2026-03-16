@@ -1,0 +1,67 @@
+{% extends "shared/dashboard_base.html" %}
+{% block page_title %}Messages{% endblock %}
+{% block breadcrumb %}Home / <span>Messages</span>{% endblock %}
+{% block sidebar_nav %}{% include "student/partials/sidebar.html" %}{% endblock %}
+
+{% block dashboard_content %}
+<div style="display:grid;grid-template-columns:300px 1fr;gap:0;background:var(--white);border-radius:var(--radius-xl);border:1px solid var(--border);overflow:hidden;height:calc(100vh - 160px);">
+
+  <div style="border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;">
+    <div style="padding:var(--space-md);border-bottom:1px solid var(--border);flex-shrink:0;">
+      <div class="search-bar"><i class="fas fa-search search-icon" style="font-size:.85rem;"></i>
+        <input type="text" placeholder="Search conversations…" oninput="document.querySelectorAll('.conv-row').forEach(i=>{i.style.display=(!this.value||i.textContent.toLowerCase().includes(this.value.toLowerCase()))?'flex':'none'})">
+      </div>
+    </div>
+    <div style="overflow-y:auto;flex:1;">
+      {% for conv in conversations %}
+      <a href="{% url 'student_messages' %}?user={{ conv.other.pk }}" class="conv-row" style="display:flex;align-items:center;gap:var(--space-sm);padding:12px var(--space-md);border-bottom:1px solid var(--border);text-decoration:none;{% if active_conv and conv.pk == active_conv.pk %}background:var(--gold-pale);border-left:3px solid var(--gold);{% endif %}">
+        <div class="avatar avatar-md" style="background:var(--navy);flex-shrink:0;">{% if conv.other %}{{ conv.other.first_name|first }}{{ conv.other.last_name|first }}{% else %}?{% endif %}</div>
+        <div style="flex:1;min-width:0;">
+          <div style="display:flex;justify-content:space-between;"><span style="font-weight:{% if conv.unread > 0 %}600{% else %}500{% endif %};font-size:.875rem;color:var(--navy);">{% if conv.other %}{{ conv.other.get_full_name }}{% else %}Unknown{% endif %}</span>{% if conv.last %}<span style="font-size:.7rem;color:var(--text-muted);">{{ conv.last.created_at|timesince|truncatewords:2 }}</span>{% endif %}</div>
+          {% if conv.last %}<div style="font-size:.775rem;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ conv.last.content|truncatechars:35 }}</div>{% endif %}
+        </div>
+        {% if conv.unread > 0 %}<div style="width:20px;height:20px;border-radius:50%;background:var(--crimson);color:white;font-size:.65rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;">{{ conv.unread }}</div>{% endif %}
+      </a>
+      {% empty %}
+      <div style="padding:var(--space-xl);text-align:center;color:var(--text-muted);"><i class="fas fa-comments" style="font-size:2rem;opacity:.3;display:block;margin-bottom:var(--space-md);"></i><p style="font-size:.875rem;">No conversations yet.</p><a href="{% url 'alumni_search' %}" class="btn btn-gold btn-sm" style="margin-top:var(--space-md);">Find Alumni</a></div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;overflow:hidden;">
+    {% if active_conv %}
+    <div style="padding:var(--space-md) var(--space-lg);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:var(--space-md);flex-shrink:0;">
+      {% for p in active_conv.participants.all %}{% if p != request.user %}
+      <div class="avatar avatar-md" style="background:var(--navy);">{{ p.first_name|first }}{{ p.last_name|first }}</div>
+      <div style="flex:1;"><div style="font-weight:600;color:var(--navy);">{{ p.get_full_name }}</div><div style="font-size:.775rem;color:var(--sage);">{% if p.is_alumni %}🏛️ Alumni{% else %}👤 User{% endif %}</div></div>
+      <a href="{% url 'alumni_profile_public' p.pk %}" class="btn btn-ghost btn-sm"><i class="fas fa-user"></i> Profile</a>
+      {% endif %}{% endfor %}
+    </div>
+    <div style="flex:1;overflow-y:auto;padding:var(--space-lg);display:flex;flex-direction:column;gap:var(--space-md);" id="chatMessages">
+      {% for msg in messages_list %}
+      <div style="display:flex;{% if msg.sender == request.user %}justify-content:flex-end{% endif %};">
+        {% if msg.sender != request.user %}<div class="avatar avatar-sm" style="background:var(--navy);margin-right:8px;align-self:flex-end;flex-shrink:0;">{{ msg.sender.first_name|first }}</div>{% endif %}
+        <div style="max-width:70%;"><div style="padding:10px 14px;border-radius:18px;{% if msg.sender == request.user %}background:var(--navy);color:var(--ivory);border-bottom-right-radius:4px;{% else %}background:var(--ivory);border:1px solid var(--border);border-bottom-left-radius:4px;{% endif %}font-size:.9rem;line-height:1.5;">{{ msg.content }}</div>
+        <div style="font-size:.7rem;color:var(--text-muted);margin-top:3px;{% if msg.sender == request.user %}text-align:right;{% endif %}">{{ msg.created_at|time:"g:i A" }}</div></div>
+      </div>
+      {% empty %}<div style="text-align:center;color:var(--text-muted);padding:var(--space-xl);margin:auto;"><i class="fas fa-comment-dots" style="font-size:2.5rem;opacity:.2;display:block;margin-bottom:var(--space-md);"></i><p>No messages yet. Send the first message!</p></div>{% endfor %}
+    </div>
+    <div style="padding:var(--space-md) var(--space-lg);border-top:1px solid var(--border);flex-shrink:0;background:var(--white);">
+      <form method="POST" action="{% url 'send_to_conv' active_conv.pk %}" id="msgForm">{% csrf_token %}
+        <div style="display:flex;gap:var(--space-sm);align-items:flex-end;">
+          <textarea name="content" id="msgInput" placeholder="Type a message… (Enter to send)" rows="1" class="form-textarea" style="flex:1;resize:none;min-height:44px;max-height:150px;padding:10px 14px;" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();document.getElementById('msgForm').submit();}" oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,150)+'px'"></textarea>
+          <button type="submit" class="btn btn-gold" style="height:44px;width:44px;border-radius:50%;padding:0;flex-shrink:0;"><i class="fas fa-paper-plane"></i></button>
+        </div>
+      </form>
+    </div>
+    {% else %}
+    <div style="flex:1;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:var(--space-md);color:var(--text-muted);">
+      <i class="fas fa-comments" style="font-size:4rem;opacity:.15;"></i>
+      <h4 style="color:var(--text-muted);font-weight:400;">Select a conversation</h4>
+      <p style="font-size:.875rem;">Or <a href="{% url 'alumni_search' %}" style="color:var(--gold);">find an alumni</a> to message.</p>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
+{% block extra_js %}<script>const c=document.getElementById('chatMessages');if(c)c.scrollTop=c.scrollHeight;</script>{% endblock %}

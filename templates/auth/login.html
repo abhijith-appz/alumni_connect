@@ -1,0 +1,137 @@
+{% extends "shared/base.html" %}
+{% block title %}Login — {% endblock %}
+{% block navbar %}{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block content %}
+<div class="auth-page">
+  <div class="auth-left">
+    <div class="auth-left-inner">
+      <a href="{% url 'home' %}" class="auth-brand">
+        <div class="navbar-logo">A</div>
+        <div>
+          <div class="navbar-brand-name">AlumniConnect</div>
+          <div class="navbar-brand-sub">Vast</div>
+        </div>
+      </a>
+      <div class="auth-hero-text">
+        <h2>Welcome<br>Back</h2>
+        <p>Sign in to access your dashboard, connect with alumni, and explore opportunities.</p>
+      </div>
+      <div class="auth-features">
+        <div class="auth-feat"><i class="fas fa-network-wired"></i> 12,000+ alumni network</div>
+        <div class="auth-feat"><i class="fas fa-briefcase"></i> Exclusive job postings</div>
+        <div class="auth-feat"><i class="fas fa-robot"></i> AI career guidance</div>
+      </div>
+      <div class="auth-quote">
+        <blockquote>"AlumniConnect helped me land my dream job at Google through an alumni referral."</blockquote>
+        <cite>— Anil Kumar, B.Tech CS 2018</cite>
+      </div>
+    </div>
+  </div>
+  <div class="auth-right">
+    <div class="auth-card">
+      <div class="auth-card-header">
+        <h3>Sign In</h3>
+        <p>Enter your credentials to continue</p>
+      </div>
+      <form method="POST" action="{% url 'login' %}" class="auth-form">
+        {% csrf_token %}
+        <div class="form-group">
+          <label class="form-label">Email or Username</label>
+          <div class="input-icon-wrap">
+            <i class="fas fa-user input-icon"></i>
+            <input type="text" name="username" class="form-input" placeholder="you@example.com" required autofocus>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" style="display:flex;justify-content:space-between;">
+            Password
+            <a href="{% url 'forgot_password' %}" style="color:var(--gold);font-weight:500;">Forgot password?</a>
+          </label>
+          <div class="input-icon-wrap">
+            <i class="fas fa-lock input-icon"></i>
+            <input type="password" name="password" id="loginPwd" class="form-input" placeholder="••••••••" required>
+            <button type="button" class="pwd-toggle" onclick="togglePwd('loginPwd',this)"><i class="fas fa-eye"></i></button>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:var(--space-md);">
+          <input type="checkbox" name="remember" id="remember" style="width:16px;height:16px;accent-color:var(--gold);">
+          <label for="remember" style="font-size:0.875rem;color:var(--text-secondary);cursor:pointer;">Remember me for 30 days</label>
+        </div>
+        <button type="submit" class="btn btn-gold btn-lg" style="width:100%;">
+          <i class="fas fa-sign-in-alt"></i> Sign In
+        </button>
+      </form>
+
+    
+      <p style="text-align:center;margin-top:var(--space-lg);font-size:0.875rem;color:var(--text-muted);">
+        Don't have an account?
+        <a href="{% url 'register_student' %}" style="color:var(--gold);font-weight:600;">Register here</a>
+      </p>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block extra_css %}
+<style>
+.auth-page { display:grid; grid-template-columns:1fr 1fr; min-height:100vh; }
+.auth-left {
+  background:linear-gradient(160deg,var(--navy) 0%,var(--navy-mid) 60%,#1a3a5c 100%);
+  padding:var(--space-2xl);
+  display:flex; align-items:stretch;
+  position:relative; overflow:hidden;
+}
+.auth-left::before {
+  content:'';position:absolute;inset:0;
+  background-image:linear-gradient(rgba(200,169,110,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(200,169,110,0.04) 1px,transparent 1px);
+  background-size:40px 40px;
+}
+.auth-left-inner { display:flex;flex-direction:column;gap:var(--space-xl);max-width:440px;width:100%;position:relative;z-index:1; }
+.auth-brand { display:flex;align-items:center;gap:12px;color:var(--ivory); }
+.auth-hero-text h2 { font-family:var(--font-display);font-size:3rem;font-weight:300;color:var(--ivory);line-height:1.1; }
+.auth-hero-text p { color:rgba(245,240,232,0.65);margin-top:var(--space-md); }
+.auth-features { display:flex;flex-direction:column;gap:10px; }
+.auth-feat { display:flex;align-items:center;gap:10px;color:rgba(245,240,232,0.75);font-size:0.9rem; }
+.auth-feat i { color:var(--gold);width:16px; }
+.auth-quote {
+  background:rgba(200,169,110,0.1);
+  border:1px solid rgba(200,169,110,0.2);
+  border-radius:var(--radius-lg);
+  padding:var(--space-md);
+  margin-top:auto;
+}
+.auth-quote blockquote { font-family:var(--font-display);font-style:italic;color:rgba(245,240,232,0.8);font-size:0.95rem;line-height:1.6; }
+.auth-quote cite { font-size:0.775rem;color:var(--gold);margin-top:8px;display:block; }
+
+.auth-right { display:flex;align-items:center;justify-content:center;padding:var(--space-2xl);background:var(--ivory); }
+.auth-card { width:100%;max-width:440px; }
+.auth-card-header { margin-bottom:var(--space-xl); }
+.auth-card-header h3 { font-family:var(--font-display);font-size:1.75rem;color:var(--navy); }
+.auth-card-header p { color:var(--text-muted);font-size:0.9rem;margin-top:4px; }
+
+.input-icon-wrap { position:relative; }
+.input-icon { position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--text-muted);font-size:0.875rem;pointer-events:none; }
+.input-icon-wrap .form-input { padding-left:38px; }
+.pwd-toggle { position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text-muted);font-size:0.875rem; }
+
+.auth-divider { display:flex;align-items:center;gap:var(--space-md);margin:var(--space-lg) 0; }
+.auth-divider::before,.auth-divider::after { content:'';flex:1;height:1px;background:var(--border); }
+.auth-divider span { font-size:0.8rem;color:var(--text-muted);white-space:nowrap; }
+
+@media(max-width:768px){
+  .auth-page{grid-template-columns:1fr;}
+  .auth-left{display:none;}
+}
+</style>
+{% endblock %}
+{% block extra_js %}
+<script>
+function togglePwd(id,btn){
+  const inp=document.getElementById(id);
+  const isText=inp.type==='text';
+  inp.type=isText?'password':'text';
+  btn.innerHTML=isText?'<i class="fas fa-eye"></i>':'<i class="fas fa-eye-slash"></i>';
+}
+</script>
+{% endblock %}

@@ -1,0 +1,170 @@
+{% extends "shared/base.html" %}
+{% load static %}
+
+{% block navbar %}{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block content %}
+<div class="dashboard-layout">
+
+  <!-- ── Sidebar ── -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">A</div>
+      <div>
+        <div class="sidebar-brand-name">AlumniConnect</div>
+        <div class="sidebar-brand-role">
+          {% if user.is_student %}Student Portal
+          {% elif user.is_alumni %}Alumni Portal
+          {% else %}Admin Panel{% endif %}
+        </div>
+      </div>
+    </div>
+
+    <div class="sidebar-user">
+      <div class="avatar avatar-md" style="background:var(--gold-pale); color:var(--gold);">
+        {% if user.photo %}
+          <img src="{{ user.photo.url }}" alt="{{ user.get_full_name }}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">
+        {% else %}
+          {{ user.first_name.0 }}{{ user.last_name.0 }}
+        {% endif %}
+      </div>
+      <div class="sidebar-user-info">
+        <div class="name">{{ user.get_full_name }}</div>
+        <div class="role-badge">
+          {% if user.is_student %}🎓 Student
+          {% elif user.is_alumni %}🏛️ Alumni
+          {% else %}⚙️ Admin{% endif %}
+        </div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      {% block sidebar_nav %}{% endblock %}
+    </nav>
+
+    <div class="sidebar-footer">
+      <a href="{% url 'user_settings' %}" class="sidebar-link">
+        <span class="link-icon"><i class="fas fa-cog"></i></span> Settings
+      </a>
+      <a href="{% url 'logout' %}" class="sidebar-link" style="color: rgba(176,58,46,0.7);">
+        <span class="link-icon"><i class="fas fa-sign-out-alt"></i></span> Log Out
+      </a>
+    </div>
+  </aside>
+
+  <!-- ── Main ── -->
+  <div class="main-content">
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="topbar-icon-btn" onclick="document.getElementById('sidebar').classList.toggle('open')" style="display:none;" id="sidebarToggle">
+          <i class="fas fa-bars"></i>
+        </button>
+        <div>
+          <div class="topbar-title">{% block page_title %}Dashboard{% endblock %}</div>
+          <div class="topbar-breadcrumb">{% block breadcrumb %}Home / Dashboard{% endblock %}</div>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <!-- Search -->
+        <div class="search-bar" style="width:220px;" id="topbarSearch">
+          <i class="fas fa-search search-icon" style="font-size:0.85rem;"></i>
+          <input type="text" placeholder="Search…" id="globalSearch" onkeypress="handleSearch(event)">
+        </div>
+        <!-- AI Button -->
+        <a href="{% url 'ai_chat' %}" class="topbar-icon-btn" title="AI Assistant" style="color:var(--gold); border-color:var(--border-gold);">
+          <i class="fas fa-robot"></i>
+        </a>
+        <!-- Notifications -->
+        <div style="position:relative;">
+          <button class="topbar-icon-btn" onclick="toggleNotifications()" id="notifBtn">
+            <i class="fas fa-bell"></i>
+            {% if unread_notifications_count > 0 %}
+            <span class="notif-dot"></span>
+            {% endif %}
+          </button>
+          <div class="notif-panel" id="notifPanel" style="display:none;">
+            <div class="notif-header">
+              <h5>Notifications</h5>
+              <a href="{% url 'notifications' %}" class="btn btn-ghost btn-sm" style="font-size:0.75rem;">View All</a>
+            </div>
+            <div class="notif-list">
+              {% for notif in recent_notifications %}
+              <div class="notif-item {% if not notif.read %}unread{% endif %}">
+                <div class="notif-item-icon" style="background:{% if notif.type == 'job' %}var(--gold-pale){% elif notif.type == 'event' %}rgba(74,124,111,0.12){% else %}rgba(15,31,61,0.08){% endif %};">
+                  {% if notif.type == 'job' %}💼{% elif notif.type == 'event' %}📅{% elif notif.type == 'message' %}💬{% else %}🔔{% endif %}
+                </div>
+                <div class="notif-item-text">
+                  <div class="title">{{ notif.message }}</div>
+                  <div class="time">{{ notif.created_at|timesince }} ago</div>
+                </div>
+              </div>
+              {% empty %}
+              <div style="padding:var(--space-xl); text-align:center; color:var(--text-muted); font-size:0.875rem;">
+                <i class="fas fa-bell-slash" style="font-size:1.5rem; margin-bottom:8px; display:block; opacity:0.4;"></i>
+                No notifications yet
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+        <!-- Profile -->
+        <div class="avatar avatar-sm" style="cursor:pointer; background:var(--navy);" onclick="window.location='{% url 'user_settings' %}'">
+          {{ user.first_name.0 }}{{ user.last_name.0 }}
+        </div>
+      </div>
+    </header>
+
+    <div class="page-body">
+      {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %}" style="margin-bottom:var(--space-md);">
+          <i class="fas fa-info-circle"></i> {{ message }}
+        </div>
+        {% endfor %}
+      {% endif %}
+
+      {% block dashboard_content %}{% endblock %}
+    </div>
+  </div>
+
+</div>
+
+<!-- AI FAB -->
+<a href="{% url 'ai_chat' %}" class="ai-fab" title="Ask AI Assistant">
+  <i class="fas fa-robot"></i>
+</a>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function toggleNotifications() {
+  const panel = document.getElementById('notifPanel');
+  panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+}
+document.addEventListener('click', function(e) {
+  const btn = document.getElementById('notifBtn');
+  const panel = document.getElementById('notifPanel');
+  if (panel && !btn.contains(e.target) && !panel.contains(e.target)) {
+    panel.style.display = 'none';
+  }
+});
+function handleSearch(e) {
+  if (e.key === 'Enter') {
+    window.location = '{% url "alumni_search" %}?q=' + e.target.value;
+  }
+}
+// Responsive sidebar toggle
+function checkMobile() {
+  const toggle = document.getElementById('sidebarToggle');
+  if (window.innerWidth <= 1024) {
+    toggle.style.display = 'flex';
+  } else {
+    toggle.style.display = 'none';
+    document.getElementById('sidebar').classList.remove('open');
+  }
+}
+window.addEventListener('resize', checkMobile);
+checkMobile();
+</script>
+{% endblock %}

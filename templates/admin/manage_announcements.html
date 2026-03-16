@@ -1,0 +1,61 @@
+{% extends "shared/dashboard_base.html" %}
+{% block page_title %}Announcements{% endblock %}
+{% block breadcrumb %}Admin / <span>Announcements</span>{% endblock %}
+{% block sidebar_nav %}{% include "admin/partials/sidebar.html" %}{% endblock %}
+{% block dashboard_content %}
+<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-xl);flex-wrap:wrap;gap:var(--space-md);">
+  <div><h3>Manage Announcements</h3><p style="color:var(--text-muted);">Broadcast messages to students and alumni</p></div>
+  <button class="btn btn-gold" onclick="toggleForm()"><i class="fas fa-plus"></i> New Announcement</button>
+</div>
+<!-- Create Form -->
+<div class="card card-gold-accent" id="announcementForm" style="display:none;margin-bottom:var(--space-xl);">
+  <h4 style="margin-bottom:var(--space-lg);">New Announcement</h4>
+  <form method="POST" action="{% url 'manage_announcements' %}">
+    {% csrf_token %}
+    <div class="form-group"><label class="form-label">Title *</label><input type="text" name="title" class="form-input" required></div>
+    <div class="form-group"><label class="form-label">Message *</label><textarea name="message" class="form-textarea" rows="4" required></textarea></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-md);">
+      <div class="form-group"><label class="form-label">Type</label><select name="announcement_type" class="form-select"><option value="general">General</option><option value="urgent">Urgent</option><option value="info">Information</option><option value="event">Event</option></select></div>
+      <div class="form-group"><label class="form-label">Target Audience</label><select name="audience" class="form-select"><option value="all">All Users</option><option value="students">Students Only</option><option value="alumni">Alumni Only</option></select></div>
+    </div>
+    <div style="display:flex;gap:var(--space-md);"><button type="submit" class="btn btn-gold"><i class="fas fa-bullhorn"></i> Publish</button><button type="button" class="btn btn-ghost" onclick="toggleForm()">Cancel</button></div>
+  </form>
+</div>
+<!-- Announcements List -->
+<div style="display:flex;flex-direction:column;gap:var(--space-md);">
+  {% for ann in announcements %}
+  <div class="announcement-card {{ ann.type }}">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:var(--space-md);flex-wrap:wrap;">
+      <div style="flex:1;">
+        <div style="display:flex;align-items:center;gap:var(--space-sm);margin-bottom:6px;">
+          <h5 style="color:var(--navy);">{{ ann.title }}</h5>
+          <span class="badge {% if ann.type == 'urgent' %}badge-red{% elif ann.type == 'info' %}badge-sage{% else %}badge-navy{% endif %}">{{ ann.type|title }}</span>
+          <span class="badge badge-gold" style="font-size:0.7rem;">{{ ann.audience|title }}</span>
+        </div>
+        <p style="font-size:0.9rem;color:var(--text-secondary);">{{ ann.message }}</p>
+        <div style="font-size:0.775rem;color:var(--text-muted);margin-top:6px;"><i class="fas fa-clock"></i> {{ ann.created_at|timesince }} ago · <i class="fas fa-eye"></i> {{ ann.views }} views</div>
+      </div>
+      <div style="display:flex;gap:var(--space-sm);flex-shrink:0;"><a href="{% url 'edit_announcement' ann.pk %}" class="btn btn-ghost btn-sm"><i class="fas fa-edit"></i></a><form method="POST" action="{% url 'delete_announcement' ann.pk %}" onsubmit="return confirm('Delete?')">{% csrf_token %}<button type="submit" class="btn btn-ghost btn-sm" style="color:var(--crimson);"><i class="fas fa-trash"></i></button></form></div>
+    </div>
+  </div>
+  {% empty %}
+  {% for i in "1234" %}
+  <div class="announcement-card {% cycle '' 'urgent' 'info' '' %}" style="background:var(--white);border:1px solid var(--border);border-left:4px solid {% cycle 'var(--gold)' 'var(--crimson)' 'var(--sage)' 'var(--navy)' %};border-radius:var(--radius-lg);padding:var(--space-lg);">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:var(--space-md);">
+      <div>
+        <div style="display:flex;align-items:center;gap:var(--space-sm);margin-bottom:6px;"><h5 style="color:var(--navy);">{% if forloop.counter == 1 %}Annual Alumni Meet 2024 Registration Open{% elif forloop.counter == 2 %}URGENT: System Maintenance on Sunday{% elif forloop.counter == 3 %}New AI Features Launched{% else %}Reminder: Alumni Directory Updated{% endif %}</h5><span class="badge {% cycle 'badge-navy' 'badge-red' 'badge-sage' 'badge-gold' %}">{% cycle "General" "Urgent" "Info" "Reminder" %}</span></div>
+        <p style="font-size:0.9rem;color:var(--text-secondary);">{% cycle "Registrations are now open for the Annual Alumni Meet on August 18th. Register early to secure your spot!" "The platform will be down for maintenance on Sunday from 2:00 AM to 4:00 AM IST. Please plan accordingly." "We've launched new AI-powered career guidance and alumni finder features. Check them out in your dashboard!" "The alumni directory has been updated with 500 new profiles. Connect with more graduates today." %}</p>
+        <div style="font-size:0.775rem;color:var(--text-muted);margin-top:6px;"><i class="fas fa-clock"></i> {{ forloop.counter }} days ago · <i class="fas fa-eye"></i> {{ forloop.counter|add:100 }} views</div>
+      </div>
+      <div style="display:flex;gap:var(--space-sm);flex-shrink:0;"><button class="btn btn-ghost btn-sm"><i class="fas fa-edit"></i></button><button class="btn btn-ghost btn-sm" style="color:var(--crimson);"><i class="fas fa-trash"></i></button></div>
+    </div>
+  </div>
+  {% endfor %}
+  {% endfor %}
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>
+function toggleForm(){const f=document.getElementById('announcementForm');f.style.display=f.style.display==='none'?'block':'none';}
+</script>
+{% endblock %}

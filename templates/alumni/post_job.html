@@ -1,0 +1,48 @@
+{% extends "shared/dashboard_base.html" %}
+{% block page_title %}Post a Job{% endblock %}
+{% block breadcrumb %}Jobs / <span>Post New Job</span>{% endblock %}
+{% block sidebar_nav %}{% include "alumni/partials/sidebar.html" %}{% endblock %}
+
+{% block dashboard_content %}
+<div style="max-width:700px;margin:0 auto;">
+  <div style="margin-bottom:var(--space-xl);">
+    <h3>Post a Job Opportunity</h3>
+    <p style="color:var(--text-muted);">Share job and internship openings with St. Xavier's students and alumni.</p>
+  </div>
+  <div class="card card-gold-accent">
+    <form method="POST" action="{% url 'post_job' %}">
+      {% csrf_token %}
+      <h5 style="color:var(--text-muted);font-size:0.75rem;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:var(--space-md);">Job Details</h5>
+      <div class="form-group"><label class="form-label">Job Title *</label><input type="text" name="title" class="form-input" placeholder="e.g. Senior Software Engineer" required></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-md);">
+        <div class="form-group"><label class="form-label">Company Name *</label><input type="text" name="company" class="form-input" placeholder="Your company name" value="{{ user.alumni_profile.company }}" required></div>
+        <div class="form-group"><label class="form-label">Job Type *</label><select name="job_type" class="form-select" required><option value="full_time">Full Time</option><option value="part_time">Part Time</option><option value="internship">Internship</option><option value="contract">Contract</option><option value="remote">Remote</option></select></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-md);">
+        <div class="form-group"><label class="form-label">Location *</label><input type="text" name="location" class="form-input" placeholder="Bangalore, India / Remote" required></div>
+        <div class="form-group"><label class="form-label">Department / Domain</label><select name="department" class="form-select"><option value="">Select Domain</option><option value="tech">Technology</option><option value="finance">Finance</option><option value="marketing">Marketing</option><option value="hr">Human Resources</option><option value="operations">Operations</option><option value="design">Design</option></select></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-md);">
+        <div class="form-group"><label class="form-label">Salary / Stipend</label><input type="text" name="salary" class="form-input" placeholder="e.g. ₹12-18 LPA or ₹25,000/month"></div>
+        <div class="form-group"><label class="form-label">Experience Required</label><input type="text" name="experience" class="form-input" placeholder="e.g. 2-4 years or Fresher"></div>
+      </div>
+      <div class="form-group"><label class="form-label">Application Deadline</label><input type="date" name="deadline" class="form-input"></div>
+      <hr class="divider">
+      <h5 style="color:var(--text-muted);font-size:0.75rem;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:var(--space-md);">Job Description</h5>
+      <div class="form-group"><label class="form-label">Job Description *</label><textarea name="description" class="form-textarea" rows="5" placeholder="Describe the role, responsibilities, and what the candidate will work on…" required></textarea></div>
+      <div class="form-group"><label class="form-label">Requirements</label><textarea name="requirements" class="form-textarea" rows="4" placeholder="List requirements one per line&#10;- B.Tech in Computer Science&#10;- 2+ years experience&#10;- Strong Python skills"></textarea></div>
+      <div class="form-group"><label class="form-label">Required Skills (comma separated)</label><input type="text" name="skills" class="form-input" placeholder="Python, Django, AWS, Docker, Git"></div>
+      <div class="form-group"><label class="form-label">Application Link / Email</label><input type="text" name="apply_link" class="form-input" placeholder="https://careers.company.com/job123 or careers@company.com"></div>
+      <div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:var(--space-xl);">
+        <input type="checkbox" name="is_active" id="isActive" checked style="width:16px;height:16px;accent-color:var(--gold);margin-top:2px;">
+        <label for="isActive" style="font-size:0.875rem;color:var(--text-secondary);">Publish this job immediately</label>
+      </div>
+      <div style="display:flex;gap:var(--space-md);">
+        <button type="submit" class="btn btn-gold btn-lg"><i class="fas fa-paper-plane"></i> Post Job</button>
+        <button type="submit" name="save_draft" class="btn btn-outline btn-lg">Save as Draft</button>
+        <a href="{% url 'alumni_dashboard' %}" class="btn btn-ghost btn-lg">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

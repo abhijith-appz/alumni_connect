@@ -1,0 +1,97 @@
+{% extends "shared/dashboard_base.html" %}
+{% block page_title %}Student Profiles{% endblock %}
+{% block breadcrumb %}Alumni / <span>Students</span>{% endblock %}
+{% block sidebar_nav %}{% include "alumni/partials/sidebar.html" %}{% endblock %}
+
+{% block dashboard_content %}
+<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-xl);flex-wrap:wrap;gap:var(--space-md);">
+  <div><h3>Student Profiles</h3><p style="color:var(--text-muted);">Browse current St. Xavier's students looking for opportunities</p></div>
+</div>
+
+<div class="card" style="margin-bottom:var(--space-xl);">
+  <div style="display:flex;gap:var(--space-md);flex-wrap:wrap;align-items:flex-end;">
+    <div style="flex:1;min-width:180px;">
+      <label class="form-label">Search</label>
+      <div class="search-bar"><i class="fas fa-search search-icon" style="font-size:.85rem;"></i>
+        <input type="text" placeholder="Name…" id="sSearch">
+      </div>
+    </div>
+    <div>
+      <label class="form-label">Department</label>
+      <select class="form-select" style="width:160px;" id="sDept">
+        <option value="">All</option>
+        <option>Computer Science</option><option>Management / MBA</option>
+        <option>Electronics & Communication</option><option>Commerce & Finance</option>
+      </select>
+    </div>
+    <div>
+      <label class="form-label">Year</label>
+      <select class="form-select" style="width:110px;" id="sYear">
+        <option value="">All</option>
+        <option>1</option><option>2</option><option>3</option><option>4</option>
+      </select>
+    </div>
+    <button class="btn btn-primary" onclick="doFilter()"><i class="fas fa-filter"></i> Filter</button>
+  </div>
+</div>
+
+<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:var(--space-lg);">
+  {% for student in students %}
+  <div style="background:var(--white);border:1px solid var(--border);border-radius:var(--radius-xl);padding:var(--space-lg);transition:all var(--transition);"
+       onmouseover="this.style.borderColor='var(--border-gold)';this.style.boxShadow='var(--shadow-md)'"
+       onmouseout="this.style.borderColor='var(--border)';this.style.boxShadow='none'">
+    <div style="display:flex;align-items:center;gap:var(--space-md);margin-bottom:var(--space-md);">
+      <div class="avatar avatar-lg" style="background:var(--navy);">{{ student.user.first_name.0 }}{{ student.user.last_name.0 }}</div>
+      <div>
+        <div style="font-family:var(--font-display);font-weight:600;color:var(--navy);">{{ student.user.get_full_name }}</div>
+        <div style="font-size:.8rem;color:var(--text-muted);">{{ student.department }}</div>
+        <div style="font-size:.775rem;color:var(--text-muted);">Year {{ student.current_year }}</div>
+      </div>
+    </div>
+    {% if student.skills %}
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:var(--space-md);">
+      {% for skill in student.get_skills_list|slice:":3" %}
+      <span class="badge badge-navy" style="font-size:.7rem;">{{ skill }}</span>
+      {% endfor %}
+    </div>
+    {% endif %}
+    <div style="display:flex;gap:var(--space-sm);">
+      <a href="{% url 'student_messages' %}?user={{ student.user.pk }}" class="btn btn-gold btn-sm" style="flex:1;justify-content:center;">
+        <i class="fas fa-comment"></i> Message
+      </a>
+    </div>
+  </div>
+  {% empty %}
+  <div style="grid-column:1/-1;text-align:center;padding:var(--space-3xl);color:var(--text-muted);">
+    <i class="fas fa-user-graduate" style="font-size:3rem;opacity:.2;display:block;margin-bottom:var(--space-md);"></i>
+    <p>No students found.</p>
+  </div>
+  {% endfor %}
+</div>
+
+{% if students.has_other_pages %}
+<div style="display:flex;justify-content:center;margin-top:var(--space-2xl);">
+  <div class="pagination">
+    {% if students.has_previous %}
+    <a href="?page={{ students.previous_page_number }}" class="page-btn"><i class="fas fa-chevron-left"></i></a>
+    {% endif %}
+    {% for num in students.paginator.page_range %}
+    <a href="?page={{ num }}" class="page-btn {% if students.number == num %}active{% endif %}">{{ num }}</a>
+    {% endfor %}
+    {% if students.has_next %}
+    <a href="?page={{ students.next_page_number }}" class="page-btn"><i class="fas fa-chevron-right"></i></a>
+    {% endif %}
+  </div>
+</div>
+{% endif %}
+{% endblock %}
+{% block extra_js %}
+<script>
+function doFilter(){
+  const q=document.getElementById('sSearch').value;
+  const d=document.getElementById('sDept').value;
+  const y=document.getElementById('sYear').value;
+  window.location='{% url "view_students" %}?q='+q+'&dept='+d+'&year='+y;
+}
+</script>
+{% endblock %}

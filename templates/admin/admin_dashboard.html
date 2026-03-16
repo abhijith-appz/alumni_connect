@@ -1,0 +1,141 @@
+{% extends "shared/dashboard_base.html" %}
+{% block page_title %}Admin Dashboard{% endblock %}
+{% block breadcrumb %}Admin / <span>Dashboard</span>{% endblock %}
+
+{% block sidebar_nav %}
+{% include "admin/partials/sidebar.html" %}
+{% endblock %}
+
+{% block dashboard_content %}
+<!-- Header -->
+<div style="background:linear-gradient(135deg,#1a1a2e,#16213e);border-radius:var(--radius-xl);padding:var(--space-xl);margin-bottom:var(--space-xl);position:relative;overflow:hidden;">
+  <div style="position:absolute;right:0;top:0;bottom:0;width:250px;background:radial-gradient(circle at right,rgba(200,169,110,0.1),transparent 70%);"></div>
+  <div style="position:relative;z-index:1;">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:var(--space-md);">
+      <div>
+        <p style="color:var(--gold);font-size:0.75rem;font-weight:600;letter-spacing:0.1em;margin-bottom:6px;">ADMINISTRATION</p>
+        <h2 style="color:var(--ivory);">System Overview</h2>
+        <p style="color:rgba(245,240,232,0.55);font-size:0.875rem;">AlumniConnect · Vast</p>
+      </div>
+      <div style="display:flex;gap:var(--space-md);">
+        <a href="{% url 'manage_alumni' %}" class="btn btn-gold"><i class="fas fa-user-check"></i> Approve Alumni</a>
+        <a href="{% url 'manage_events' %}" class="btn btn-outline" style="color:var(--ivory);border-color:rgba(245,240,232,0.35);">Create Event</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Stats Grid -->
+<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:var(--space-md);margin-bottom:var(--space-xl);">
+  <div class="stat-card">
+    <div style="display:flex;justify-content:space-between;margin-bottom:var(--space-sm);"><div class="stat-icon"><i class="fas fa-users"></i></div><span style="font-size:0.75rem;color:var(--sage);">+{{ new_users_this_month|default:28 }} this month</span></div>
+    <div class="stat-value">{{ total_users|default:"15,532" }}</div>
+    <div class="stat-label">Total Users</div>
+  </div>
+  <div class="stat-card">
+    <div style="display:flex;justify-content:space-between;margin-bottom:var(--space-sm);"><div class="stat-icon" style="background:rgba(74,124,111,0.12);color:var(--sage);"><i class="fas fa-user-graduate"></i></div><span style="font-size:0.75rem;color:var(--sage);">Active</span></div>
+    <div class="stat-value">{{ total_students|default:"3,521" }}</div>
+    <div class="stat-label">Students</div>
+  </div>
+  <div class="stat-card">
+    <div style="display:flex;justify-content:space-between;margin-bottom:var(--space-sm);"><div class="stat-icon" style="background:rgba(15,31,61,0.08);color:var(--navy);"><i class="fas fa-university"></i></div>{% if pending_alumni_count %}<span style="font-size:0.75rem;color:var(--crimson);">{{ pending_alumni_count }} pending</span>{% endif %}</div>
+    <div class="stat-value">{{ total_alumni|default:"12,011" }}</div>
+    <div class="stat-label">Alumni</div>
+  </div>
+  <div class="stat-card">
+    <div style="display:flex;justify-content:space-between;margin-bottom:var(--space-sm);"><div class="stat-icon" style="background:var(--gold-pale);color:var(--gold);"><i class="fas fa-briefcase"></i></div></div>
+    <div class="stat-value">{{ active_jobs|default:287 }}</div>
+    <div class="stat-label">Active Jobs</div>
+  </div>
+</div>
+
+<!-- Main Grid -->
+<div style="display:grid;grid-template-columns:2fr 1fr;gap:var(--space-xl);">
+  <div>
+    <!-- Pending Alumni Approvals -->
+    {% if pending_alumni %}
+    <div class="card" style="margin-bottom:var(--space-lg);">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-lg);">
+        <h4><i class="fas fa-user-clock" style="color:var(--crimson);margin-right:8px;font-size:0.9rem;"></i>Pending Alumni Approvals</h4>
+        <a href="{% url 'manage_alumni' %}" class="btn btn-ghost btn-sm">View All</a>
+      </div>
+      {% for alumni in pending_alumni %}
+      <div style="display:flex;align-items:center;gap:var(--space-md);padding:var(--space-md);border:1px solid var(--border);border-radius:var(--radius-md);margin-bottom:var(--space-sm);">
+        <div class="avatar avatar-md" style="background:var(--navy);">{{ alumni.user.first_name.0 }}</div>
+        <div style="flex:1;">
+          <div style="font-weight:600;color:var(--navy);font-size:0.9rem;">{{ alumni.user.get_full_name }}</div>
+          <div style="font-size:0.8rem;color:var(--text-muted);">{{ alumni.department }} · {{ alumni.graduation_year }} · {{ alumni.company }}</div>
+        </div>
+        <div style="display:flex;gap:var(--space-sm);">
+          <form method="POST" action="{% url 'approve_alumni' alumni.pk %}" style="display:inline;">{% csrf_token %}<button type="submit" class="btn btn-sm" style="background:var(--sage);color:white;border:none;"><i class="fas fa-check"></i> Approve</button></form>
+          <form method="POST" action="{% url 'reject_alumni' alumni.pk %}" style="display:inline;">{% csrf_token %}<button type="submit" class="btn btn-danger btn-sm"><i class="fas fa-times"></i></button></form>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Recent Activity -->
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-lg);">
+        <h4>Recent Activity</h4>
+        <a href="{% url 'system_reports' %}" class="btn btn-ghost btn-sm">Full Reports</a>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>User</th><th>Action</th><th>Time</th><th>Status</th></tr></thead>
+          <tbody>
+            {% for activity in recent_activities %}
+            <tr>
+              <td><div style="font-weight:500;color:var(--navy);">{{ activity.user }}</div></td>
+              <td>{{ activity.action }}</td>
+              <td style="white-space:nowrap;">{{ activity.time|timesince }} ago</td>
+              <td><span class="badge badge-{{ activity.status_class }}">{{ activity.status }}</span></td>
+            </tr>
+            {% empty %}
+            <tr><td><div style="font-weight:500;color:var(--navy);">Anil Kumar</div></td><td>New alumni registration</td><td>5 min ago</td><td><span class="badge badge-gold">Pending</span></td></tr>
+            <tr><td><div style="font-weight:500;color:var(--navy);">Sunita Rao</div></td><td>Posted a new job</td><td>1h ago</td><td><span class="badge badge-green">Active</span></td></tr>
+            <tr><td><div style="font-weight:500;color:var(--navy);">Rahul S.</div></td><td>Student registered</td><td>2h ago</td><td><span class="badge badge-sage">Verified</span></td></tr>
+            <tr><td><div style="font-weight:500;color:var(--navy);">Priya T.</div></td><td>Event registration</td><td>3h ago</td><td><span class="badge badge-navy">Confirmed</span></td></tr>
+            <tr><td><div style="font-weight:500;color:var(--navy);">Dev V.</div></td><td>Updated profile</td><td>5h ago</td><td><span class="badge badge-sage">Done</span></td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right Column -->
+  <div>
+    <!-- Quick Actions -->
+    <div class="card" style="margin-bottom:var(--space-lg);">
+      <h5 style="margin-bottom:var(--space-md);">Quick Actions</h5>
+      <div style="display:flex;flex-direction:column;gap:var(--space-sm);">
+        <a href="{% url 'manage_alumni' %}" class="btn btn-outline" style="justify-content:flex-start;"><i class="fas fa-user-check" style="width:20px;color:var(--gold);"></i> Approve Alumni</a>
+        <a href="{% url 'manage_events' %}?action=create" class="btn btn-outline" style="justify-content:flex-start;"><i class="fas fa-calendar-plus" style="width:20px;color:var(--sage);"></i> Create Event</a>
+        <a href="{% url 'manage_announcements' %}?action=create" class="btn btn-outline" style="justify-content:flex-start;"><i class="fas fa-bullhorn" style="width:20px;color:var(--navy);"></i> Post Announcement</a>
+        <a href="{% url 'system_reports' %}" class="btn btn-outline" style="justify-content:flex-start;"><i class="fas fa-chart-bar" style="width:20px;color:var(--crimson);"></i> View Reports</a>
+      </div>
+    </div>
+
+    <!-- System Stats -->
+    <div class="card">
+      <h5 style="margin-bottom:var(--space-md);">Platform Stats</h5>
+      <div style="display:flex;flex-direction:column;gap:var(--space-sm);">
+        {% for stat in platform_stats %}
+        <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:0.875rem;">
+          <span style="color:var(--text-secondary);">{{ stat.label }}</span>
+          <strong style="color:var(--navy);">{{ stat.value }}</strong>
+        </div>
+        {% empty %}
+        <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:0.875rem;"><span style="color:var(--text-secondary);">Active Sessions</span><strong style="color:var(--navy);">342</strong></div>
+        <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:0.875rem;"><span style="color:var(--text-secondary);">Messages Today</span><strong style="color:var(--navy);">127</strong></div>
+        <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:0.875rem;"><span style="color:var(--text-secondary);">Job Applications</span><strong style="color:var(--navy);">89</strong></div>
+        <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:0.875rem;"><span style="color:var(--text-secondary);">AI Chats Today</span><strong style="color:var(--navy);">214</strong></div>
+        <div style="display:flex;justify-content:space-between;padding:8px 0;font-size:0.875rem;"><span style="color:var(--text-secondary);">Events This Month</span><strong style="color:var(--navy);">6</strong></div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,29 @@
+{% extends "shared/base.html" %}
+{% block title %}Page Not Found — {% endblock %}
+{% block navbar %}{% endblock %}
+{% block footer %}{% endblock %}
+{% block content %}
+<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--ivory);text-align:center;padding:var(--space-xl);">
+  <div style="max-width:500px;">
+    <div style="font-size:8rem;font-family:var(--font-display);font-weight:300;color:var(--border);line-height:1;margin-bottom:var(--space-md);">404</div>
+    <h2 style="margin-bottom:var(--space-md);">Page Not Found</h2>
+    <p style="color:var(--text-muted);margin-bottom:var(--space-xl);">The page you're looking for doesn't exist or has been moved. Let's get you back on track.</p>
+    <div style="display:flex;gap:var(--space-md);justify-content:center;flex-wrap:wrap;">
+      <a href="javascript:history.back()" class="btn btn-outline">← Go Back</a>
+      <a href="{% url 'home' %}" class="btn btn-gold"><i class="fas fa-home"></i> Go to Home</a>
+    </div>
+    <div style="margin-top:var(--space-2xl);padding:var(--space-lg);background:var(--white);border-radius:var(--radius-xl);border:1px solid var(--border);">
+      <p style="font-size:0.875rem;color:var(--text-muted);margin-bottom:var(--space-md);">Looking for something specific?</p>
+      <div style="display:flex;gap:var(--space-sm);flex-wrap:wrap;justify-content:center;">
+        <a href="{% url 'alumni_directory' %}" class="btn btn-ghost btn-sm">Alumni Directory</a>
+        <a href="{% url 'student_jobs' %}" class="btn btn-ghost btn-sm">Job Board</a>
+        <a href="{% url 'contact' %}" class="btn btn-ghost btn-sm">Contact Us</a>
+        <a href="{% url 'faq' %}" class="btn btn-ghost btn-sm">FAQ</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+
+{# ============ shared/403.html ============ #}

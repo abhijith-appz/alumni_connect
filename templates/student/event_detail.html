@@ -1,0 +1,120 @@
+{% extends "shared/dashboard_base.html" %}
+{% block page_title %}Event Details{% endblock %}
+{% block breadcrumb %}Events / <span>{{ event.title|default:"Event" }}</span>{% endblock %}
+{% block sidebar_nav %}{% include "student/partials/sidebar.html" %}{% endblock %}
+
+{% block dashboard_content %}
+<div style="display:grid;grid-template-columns:2fr 1fr;gap:var(--space-xl);">
+  <div>
+    <div class="card card-gold-accent">
+      <!-- Event Banner -->
+      <div style="background:linear-gradient(135deg,var(--navy),var(--navy-light));border-radius:var(--radius-lg);height:220px;display:flex;align-items:center;justify-content:center;margin-bottom:var(--space-xl);position:relative;overflow:hidden;">
+        <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(200,169,110,0.05) 1px,transparent 1px),linear-gradient(90deg,rgba(200,169,110,0.05) 1px,transparent 1px);background-size:30px 30px;"></div>
+        <div style="text-align:center;position:relative;z-index:1;">
+          <div style="font-size:3.5rem;margin-bottom:8px;">🏛️</div>
+          <span class="badge badge-gold" style="font-size:0.875rem;">{{ event.event_type|default:"On Campus" }}</span>
+        </div>
+      </div>
+
+      <h2 style="margin-bottom:var(--space-md);">{{ event.title|default:"Annual Alumni Meet 2024" }}</h2>
+
+      <!-- Meta Grid -->
+      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:var(--space-md);margin-bottom:var(--space-xl);">
+        <div style="display:flex;align-items:center;gap:10px;padding:var(--space-md);background:var(--ivory);border-radius:var(--radius-md);">
+          <div style="width:36px;height:36px;border-radius:var(--radius-md);background:var(--gold-pale);color:var(--gold);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="fas fa-calendar"></i></div>
+          <div><div style="font-size:0.75rem;color:var(--text-muted);">DATE</div><div style="font-weight:600;font-size:0.9rem;color:var(--navy);">{{ event.date|default:"August 18, 2024" }}</div></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;padding:var(--space-md);background:var(--ivory);border-radius:var(--radius-md);">
+          <div style="width:36px;height:36px;border-radius:var(--radius-md);background:rgba(74,124,111,0.12);color:var(--sage);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="fas fa-clock"></i></div>
+          <div><div style="font-size:0.75rem;color:var(--text-muted);">TIME</div><div style="font-weight:600;font-size:0.9rem;color:var(--navy);">{{ event.time|default:"10:00 AM – 4:00 PM IST" }}</div></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;padding:var(--space-md);background:var(--ivory);border-radius:var(--radius-md);">
+          <div style="width:36px;height:36px;border-radius:var(--radius-md);background:rgba(15,31,61,0.08);color:var(--navy);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="fas fa-map-marker-alt"></i></div>
+          <div><div style="font-size:0.75rem;color:var(--text-muted);">VENUE</div><div style="font-weight:600;font-size:0.9rem;color:var(--navy);">{{ event.location|default:"Main Campus Auditorium" }}</div></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;padding:var(--space-md);background:var(--ivory);border-radius:var(--radius-md);">
+          <div style="width:36px;height:36px;border-radius:var(--radius-md);background:var(--gold-pale);color:var(--gold);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="fas fa-users"></i></div>
+          <div><div style="font-size:0.75rem;color:var(--text-muted);">CAPACITY</div><div style="font-weight:600;font-size:0.9rem;color:var(--navy);">{{ event.registered_count|default:87 }} / {{ event.capacity|default:200 }} registered</div></div>
+        </div>
+      </div>
+
+      <h4 style="margin-bottom:var(--space-md);">About This Event</h4>
+      <div style="color:var(--text-secondary);line-height:1.8;margin-bottom:var(--space-xl);">
+        {{ event.description|default:"Join us for the Annual Alumni Meet 2024 — a flagship gathering bringing together graduates from all batches to reconnect, share experiences, and inspire the next generation of St. Xavier's students. This event features keynote talks, networking sessions, a career fair, and a gala dinner." }}
+      </div>
+
+      <!-- Agenda -->
+      <h4 style="margin-bottom:var(--space-md);">Event Schedule</h4>
+      <div style="display:flex;flex-direction:column;gap:0;">
+        {% for agenda_item in event.agenda_items %}
+        <div style="display:flex;gap:var(--space-lg);padding:var(--space-md) 0;border-bottom:1px solid var(--border);">
+          <div style="width:80px;flex-shrink:0;font-weight:600;color:var(--gold);font-size:0.875rem;">{{ agenda_item.time }}</div>
+          <div><div style="font-weight:600;color:var(--navy);font-size:0.9rem;">{{ agenda_item.title }}</div><div style="font-size:0.8rem;color:var(--text-muted);">{{ agenda_item.description }}</div></div>
+        </div>
+        {% empty %}
+        {% for item in "12345" %}
+        <div style="display:flex;gap:var(--space-lg);padding:var(--space-md) 0;border-bottom:1px solid var(--border);">
+          <div style="width:80px;flex-shrink:0;font-weight:600;color:var(--gold);font-size:0.875rem;">{% if forloop.counter == 1 %}9:00 AM{% elif forloop.counter == 2 %}10:30 AM{% elif forloop.counter == 3 %}12:00 PM{% elif forloop.counter == 4 %}2:00 PM{% else %}3:30 PM{% endif %}</div>
+          <div>
+            <div style="font-weight:600;color:var(--navy);font-size:0.9rem;">{% if forloop.counter == 1 %}Registration & Welcome Tea{% elif forloop.counter == 2 %}Keynote: The Xavier's Legacy{% elif forloop.counter == 3 %}Networking Lunch{% elif forloop.counter == 4 %}Panel: Careers Across Decades{% else %}Gala Dinner & Cultural{% endif %}</div>
+            <div style="font-size:0.8rem;color:var(--text-muted);">{% if forloop.counter == 1 %}Check in and collect your badge{% elif forloop.counter == 2 %}Address by the Principal and Distinguished Alumni{% elif forloop.counter == 3 %}Buffet lunch — connect with alumni{% elif forloop.counter == 4 %}Alumni share career journeys across industries{% else %}Closing ceremony and entertainment{% endif %}</div>
+          </div>
+        </div>
+        {% endfor %}
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Right Sidebar -->
+  <div>
+    <!-- Registration Card -->
+    <div class="card card-gold-accent" style="margin-bottom:var(--space-lg);position:sticky;top:80px;">
+      {% if user_registered %}
+      <div style="text-align:center;padding:var(--space-md) 0;">
+        <div style="font-size:2.5rem;margin-bottom:var(--space-sm);">✅</div>
+        <h4>You're Registered!</h4>
+        <p style="font-size:0.875rem;color:var(--text-muted);margin-bottom:var(--space-md);">A confirmation was sent to your email.</p>
+        <a href="#" class="btn btn-outline btn-sm" style="width:100%;justify-content:center;" onclick="window.print()"><i class="fas fa-download"></i> Download Ticket</a>
+      </div>
+      {% else %}
+      <h4 style="margin-bottom:6px;">Register for This Event</h4>
+      <p style="font-size:0.875rem;color:var(--text-muted);margin-bottom:var(--space-lg);">{{ event.spots_left|default:113 }} spots remaining</p>
+      <form method="POST" action="{% url 'event_register' event.pk|default:1 %}">
+        {% csrf_token %}
+        <div class="form-group">
+          <label class="form-label">Dietary Preference</label>
+          <select name="dietary" class="form-select">
+            <option value="none">No Preference</option>
+            <option value="veg">Vegetarian</option>
+            <option value="vegan">Vegan</option>
+            <option value="jain">Jain</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Any Special Needs?</label>
+          <input type="text" name="special_needs" class="form-input" placeholder="Wheelchair, etc.">
+        </div>
+        <button type="submit" class="btn btn-gold btn-lg" style="width:100%;justify-content:center;">
+          <i class="fas fa-check-circle"></i> Register Now
+        </button>
+        <p style="font-size:0.75rem;color:var(--text-muted);text-align:center;margin-top:8px;">Free for all students</p>
+      </form>
+      {% endif %}
+    </div>
+
+    <!-- Organizer -->
+    <div class="card">
+      <h5 style="margin-bottom:var(--space-md);">Organized By</h5>
+      <div style="display:flex;align-items:center;gap:var(--space-md);">
+        <div class="avatar avatar-md" style="background:var(--navy);">AO</div>
+        <div>
+          <div style="font-weight:600;font-size:0.875rem;color:var(--navy);">Alumni Office</div>
+          <div style="font-size:0.775rem;color:var(--text-muted);">Vast</div>
+          <a href="mailto:alumni@stxaviers.edu" style="font-size:0.775rem;color:var(--gold);">alumni@stxaviers.edu</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

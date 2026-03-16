@@ -1,0 +1,181 @@
+{% extends "shared/dashboard_base.html" %}
+{% block page_title %}AI Assistant{% endblock %}
+{% block breadcrumb %}Home / <span>AI Assistant</span>{% endblock %}
+{% block sidebar_nav %}
+{% if user.is_student %}{% include "student/partials/sidebar.html" %}
+{% else %}{% include "alumni/partials/sidebar.html" %}{% endif %}
+{% endblock %}
+
+{% block dashboard_content %}
+<div style="display:grid;grid-template-columns:280px 1fr;gap:var(--space-lg);height:calc(100vh - 140px);">
+
+  <!-- Left: Chat History + Quick Actions -->
+  <div style="display:flex;flex-direction:column;gap:var(--space-md);">
+    <button class="btn btn-gold" style="width:100%;justify-content:center;" onclick="newChat()">
+      <i class="fas fa-plus"></i> New Conversation
+    </button>
+
+    <!-- Quick Prompts -->
+    <div class="card" style="flex-shrink:0;">
+      <h5 style="margin-bottom:var(--space-md);font-size:0.875rem;">Quick Prompts</h5>
+      <div style="display:flex;flex-direction:column;gap:6px;">
+        {% for prompt in quick_prompts %}
+        <button class="btn btn-ghost btn-sm" style="justify-content:flex-start;text-align:left;white-space:normal;line-height:1.3;" onclick="sendQuick('{{ prompt.text }}')">{{ prompt.label }}</button>
+        {% empty %}
+        <button class="btn btn-ghost btn-sm" style="justify-content:flex-start;text-align:left;white-space:normal;line-height:1.3;" onclick="sendQuick('What career paths suit a Computer Science graduate?')">💼 Career paths for CS grad</button>
+        <button class="btn btn-ghost btn-sm" style="justify-content:flex-start;text-align:left;white-space:normal;line-height:1.3;" onclick="sendQuick('Find alumni working at Google in India')">🔍 Alumni at Google</button>
+        <button class="btn btn-ghost btn-sm" style="justify-content:flex-start;text-align:left;white-space:normal;line-height:1.3;" onclick="sendQuick('What skills should I learn for data science?')">🧠 Skills for Data Science</button>
+        <button class="btn btn-ghost btn-sm" style="justify-content:flex-start;text-align:left;white-space:normal;line-height:1.3;" onclick="sendQuick('Recommend internships for 2nd year students')">🎓 Internship suggestions</button>
+        <button class="btn btn-ghost btn-sm" style="justify-content:flex-start;text-align:left;white-space:normal;line-height:1.3;" onclick="sendQuick('How do I prepare for a campus placement interview?')">📝 Interview preparation</button>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Past Conversations -->
+    <div class="card" style="flex:1;overflow-y:auto;">
+      <h5 style="margin-bottom:var(--space-md);font-size:0.875rem;">Recent Chats</h5>
+      <div style="display:flex;flex-direction:column;gap:4px;">
+        {% for chat in past_chats %}
+        <a href="{% url 'ai_chat' %}?chat={{ chat.pk }}" style="display:flex;align-items:center;gap:8px;padding:8px;border-radius:var(--radius-md);font-size:0.8125rem;color:var(--text-secondary);transition:background var(--transition);" onmouseover="this.style.background='var(--ivory)'" onmouseout="this.style.background='transparent'">
+          <i class="fas fa-comment" style="font-size:0.75rem;color:var(--text-muted);flex-shrink:0;"></i>
+          <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ chat.title }}</span>
+        </a>
+        {% empty %}
+        <div style="color:var(--text-muted);font-size:0.8125rem;text-align:center;padding:var(--space-md);">No previous chats</div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Right: Chat Interface -->
+  <div style="background:var(--white);border-radius:var(--radius-xl);border:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;">
+    <!-- Header -->
+    <div style="padding:var(--space-md) var(--space-lg);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:var(--space-md);">
+      <div style="width:40px;height:40px;border-radius:var(--radius-md);background:linear-gradient(135deg,var(--navy),var(--navy-light));color:var(--gold);display:flex;align-items:center;justify-content:center;font-size:1.1rem;">
+        <i class="fas fa-robot"></i>
+      </div>
+      <div>
+        <div style="font-weight:600;color:var(--navy);">AlumniConnect AI</div>
+        <div style="font-size:0.775rem;color:var(--sage);">🟢 Online · Powered by AI</div>
+      </div>
+      <div style="margin-left:auto;display:flex;gap:var(--space-sm);">
+        <a href="{% url 'ai_career_guidance' %}" class="btn btn-ghost btn-sm"><i class="fas fa-chart-line"></i> Career Guide</a>
+        <a href="{% url 'ai_alumni_finder' %}" class="btn btn-ghost btn-sm"><i class="fas fa-user-friends"></i> Find Alumni</a>
+      </div>
+    </div>
+
+    <!-- Messages -->
+    <div id="chatMessages" style="flex:1;overflow-y:auto;padding:var(--space-xl);display:flex;flex-direction:column;gap:var(--space-lg);">
+      <!-- Welcome message -->
+      <div style="display:flex;gap:var(--space-md);align-items:flex-start;max-width:80%;">
+        <div style="width:36px;height:36px;border-radius:var(--radius-md);background:linear-gradient(135deg,var(--navy),var(--navy-light));color:var(--gold);display:flex;align-items:center;justify-content:center;font-size:0.9rem;flex-shrink:0;margin-top:2px;">
+          <i class="fas fa-robot"></i>
+        </div>
+        <div>
+          <div style="padding:14px 18px;background:var(--ivory);border:1px solid var(--border);border-radius:18px;border-top-left-radius:4px;font-size:0.9375rem;color:var(--text-primary);line-height:1.6;">
+            Hello, {{ user.first_name }}! 👋 I'm your AlumniConnect AI assistant. I can help you:
+            <ul style="margin-top:8px;padding-left:20px;color:var(--text-secondary);">
+              <li>Find alumni mentors in specific industries</li>
+              <li>Explore career paths suited to your skills</li>
+              <li>Get job and internship recommendations</li>
+              <li>Prepare for interviews and improve your resume</li>
+              <li>Navigate the AlumniConnect platform</li>
+            </ul>
+            What can I help you with today?
+          </div>
+          <div style="font-size:0.7rem;color:var(--text-muted);margin-top:4px;">AI Assistant</div>
+        </div>
+      </div>
+
+      {% for msg in chat_messages %}
+      <div style="display:flex;{% if msg.role == 'user' %}justify-content:flex-end{% else %}align-items:flex-start;gap:var(--space-md){% endif %};">
+        {% if msg.role == 'assistant' %}
+        <div style="width:36px;height:36px;border-radius:var(--radius-md);background:linear-gradient(135deg,var(--navy),var(--navy-light));color:var(--gold);display:flex;align-items:center;justify-content:center;font-size:0.9rem;flex-shrink:0;margin-top:2px;"><i class="fas fa-robot"></i></div>
+        {% endif %}
+        <div style="max-width:75%;">
+          <div style="padding:12px 16px;border-radius:18px;{% if msg.role == 'user' %}background:var(--navy);color:var(--ivory);border-bottom-right-radius:4px;{% else %}background:var(--ivory);border:1px solid var(--border);color:var(--text-primary);border-top-left-radius:4px;{% endif %}font-size:0.9375rem;line-height:1.6;">
+            {{ msg.content|linebreaks }}
+          </div>
+          <div style="font-size:0.7rem;color:var(--text-muted);margin-top:4px;{% if msg.role == 'user' %}text-align:right{% endif %};">
+            {% if msg.role == 'user' %}You · {% endif %}{{ msg.created_at|time:"g:i A" }}
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+
+      <!-- Typing indicator (hidden by default) -->
+      <div id="typingIndicator" style="display:none;align-items:flex-start;gap:var(--space-md);">
+        <div style="width:36px;height:36px;border-radius:var(--radius-md);background:linear-gradient(135deg,var(--navy),var(--navy-light));color:var(--gold);display:flex;align-items:center;justify-content:center;font-size:0.9rem;flex-shrink:0;"><i class="fas fa-robot"></i></div>
+        <div style="padding:14px 18px;background:var(--ivory);border:1px solid var(--border);border-radius:18px;border-top-left-radius:4px;">
+          <div class="typing-dots"><span></span><span></span><span></span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Input -->
+    <div style="padding:var(--space-md) var(--space-lg);border-top:1px solid var(--border);">
+      <form id="chatForm" method="POST" action="{% url 'ai_chat' %}" style="display:flex;gap:var(--space-sm);align-items:flex-end;">
+        {% csrf_token %}
+        <textarea name="message" id="chatInput" placeholder="Ask me anything about careers, alumni, jobs…" rows="1"
+          class="form-textarea"
+          style="flex:1;resize:none;min-height:48px;max-height:200px;padding:12px 16px;border-radius:var(--radius-xl);"
+          onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+        <button type="submit" class="btn btn-gold" style="height:48px;border-radius:var(--radius-xl);padding:0 20px;" id="sendBtn">
+          <i class="fas fa-paper-plane"></i>
+        </button>
+      </form>
+      <p style="font-size:0.7rem;color:var(--text-muted);text-align:center;margin-top:8px;">AI responses are generated automatically and may not always be accurate. Always verify important information.</p>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.typing-dots{display:flex;align-items:center;gap:4px;}
+.typing-dots span{width:7px;height:7px;border-radius:50%;background:var(--text-muted);animation:typingBounce 1.4s ease infinite;}
+.typing-dots span:nth-child(2){animation-delay:0.2s;}
+.typing-dots span:nth-child(3){animation-delay:0.4s;}
+@keyframes typingBounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const msgs = document.getElementById('chatMessages');
+if(msgs) msgs.scrollTop = msgs.scrollHeight;
+
+function autoResize(el) {
+  el.style.height='auto';
+  el.style.height=Math.min(el.scrollHeight,200)+'px';
+}
+function handleKey(e) {
+  if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();submitChat();}
+}
+function sendQuick(text) {
+  document.getElementById('chatInput').value=text;
+  submitChat();
+}
+function newChat() {
+  window.location='{% url "ai_chat" %}?new=1';
+}
+function submitChat() {
+  const form=document.getElementById('chatForm');
+  const input=document.getElementById('chatInput');
+  if(!input.value.trim()) return;
+
+  // Show user message immediately
+  const userMsg=document.createElement('div');
+  userMsg.style.cssText='display:flex;justify-content:flex-end;';
+  userMsg.innerHTML=`<div style="max-width:75%;"><div style="padding:12px 16px;border-radius:18px;border-bottom-right-radius:4px;background:var(--navy);color:var(--ivory);font-size:0.9375rem;line-height:1.6;">${input.value}</div></div>`;
+  msgs.appendChild(userMsg);
+
+  // Show typing indicator
+  const typingEl=document.getElementById('typingIndicator');
+  typingEl.style.display='flex';
+  msgs.scrollTop=msgs.scrollHeight;
+
+  form.submit();
+}
+</script>
+{% endblock %}

@@ -1,0 +1,50 @@
+{% extends "shared/dashboard_base.html" %}
+{% block page_title %}Edit Profile{% endblock %}
+{% block breadcrumb %}Profile / <span>Edit</span>{% endblock %}
+{% block sidebar_nav %}{% include "alumni/partials/sidebar.html" %}{% endblock %}
+{% block dashboard_content %}
+<div style="max-width:700px;margin:0 auto;">
+  <div style="margin-bottom:var(--space-xl);"><h3>Edit Alumni Profile</h3><p style="color:var(--text-muted);">Keep your information up to date so students and alumni can find you.</p></div>
+  <div class="card card-gold-accent">
+    <form method="POST" action="{% url 'edit_alumni_profile' %}" enctype="multipart/form-data">
+      {% csrf_token %}
+      <!-- Photo -->
+      <div class="profile-edit-section-title" style="font-size:0.75rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);margin-bottom:var(--space-lg);padding-bottom:var(--space-sm);border-bottom:1px solid var(--border);">Profile Photo</div>
+      <div style="display:flex;align-items:center;gap:var(--space-xl);margin-bottom:var(--space-xl);">
+        <div style="position:relative;">
+          <div class="avatar avatar-xl" style="background:var(--navy);">{{ user.first_name.0 }}{{ user.last_name.0 }}</div>
+          <label for="photoUpload" style="position:absolute;bottom:0;right:0;width:32px;height:32px;border-radius:50%;background:var(--gold);color:var(--navy);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:0.8rem;border:2px solid white;"><i class="fas fa-camera"></i></label>
+          <input type="file" id="photoUpload" name="photo" style="display:none;" accept="image/*">
+        </div>
+        <div><label for="photoUpload" class="btn btn-outline btn-sm" style="cursor:pointer;">Upload New Photo</label><p style="font-size:0.75rem;color:var(--text-muted);margin-top:6px;">JPG or PNG, max 2MB</p></div>
+      </div>
+      <!-- Personal -->
+      <div class="profile-edit-section-title" style="font-size:0.75rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);margin-bottom:var(--space-lg);padding-bottom:var(--space-sm);border-bottom:1px solid var(--border);">Personal Information</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-md);">
+        <div class="form-group"><label class="form-label">First Name</label><input type="text" name="first_name" class="form-input" value="{{ user.first_name }}"></div>
+        <div class="form-group"><label class="form-label">Last Name</label><input type="text" name="last_name" class="form-input" value="{{ user.last_name }}"></div>
+      </div>
+      <div class="form-group"><label class="form-label">Email</label><input type="email" name="email" class="form-input" value="{{ user.email }}"></div>
+      <div class="form-group"><label class="form-label">Phone</label><input type="tel" name="phone" class="form-input" value="{{ user.alumni_profile.phone }}"></div>
+      <div class="form-group"><label class="form-label">Location</label><input type="text" name="location" class="form-input" placeholder="City, Country" value="{{ user.alumni_profile.location }}"></div>
+      <div class="form-group"><label class="form-label">Bio</label><textarea name="bio" class="form-textarea" rows="4" placeholder="A brief introduction about yourself, your career, and how you can help students…">{{ user.alumni_profile.bio }}</textarea></div>
+      <!-- Professional -->
+      <div class="profile-edit-section-title" style="font-size:0.75rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);margin-bottom:var(--space-lg);padding-bottom:var(--space-sm);border-bottom:1px solid var(--border);margin-top:var(--space-xl);">Professional Details</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-md);">
+        <div class="form-group"><label class="form-label">Current Position</label><input type="text" name="current_position" class="form-input" value="{{ user.alumni_profile.current_position }}" placeholder="Software Engineer"></div>
+        <div class="form-group"><label class="form-label">Current Company</label><input type="text" name="company" class="form-input" value="{{ user.alumni_profile.company }}" placeholder="Google"></div>
+      </div>
+      <div class="form-group"><label class="form-label">Skills (comma separated)</label><input type="text" name="skills" class="form-input" value="{{ user.alumni_profile.skills }}" placeholder="Python, Leadership, System Design…"></div>
+      <div class="form-group"><label class="form-label">LinkedIn URL</label><input type="url" name="linkedin_url" class="form-input" value="{{ user.alumni_profile.linkedin_url }}"></div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:var(--space-xl);">
+        <input type="checkbox" name="is_mentor_available" id="mentorAvail" {% if user.alumni_profile.is_mentor_available %}checked{% endif %} style="width:16px;height:16px;accent-color:var(--gold);">
+        <label for="mentorAvail" style="font-size:0.875rem;color:var(--text-secondary);">I am open to mentoring students</label>
+      </div>
+      <div style="display:flex;gap:var(--space-md);">
+        <button type="submit" class="btn btn-gold btn-lg"><i class="fas fa-save"></i> Save Changes</button>
+        <a href="{% url 'alumni_profile' %}" class="btn btn-ghost btn-lg">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,79 @@
+{% extends "shared/base.html" %}
+{% block title %}About — {% endblock %}
+{% block content %}
+<section class="page-hero" style="background:linear-gradient(135deg,var(--navy),var(--navy-mid));padding:var(--space-3xl) 0;">
+  <div class="container text-center">
+    <span class="section-eyebrow" style="color:var(--gold-light);">Our Story</span>
+    <h1 style="color:var(--ivory);margin-bottom:var(--space-md);">About AlumniConnect</h1>
+    <p style="color:rgba(245,240,232,0.7);max-width:560px;margin:0 auto;">Fostering lifelong connections between St. Xavier's students and our vibrant global alumni network since 1962.</p>
+  </div>
+</section>
+<section style="padding:var(--space-3xl) 0;background:var(--white);">
+  <div class="container">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-3xl);align-items:center;">
+      <div>
+        <span class="section-eyebrow">Our Mission</span>
+        <h2 class="section-title">Building Bridges Across<br>Generations</h2>
+        <div class="section-divider"></div>
+        <p style="margin-bottom:var(--space-md);">Vast has been shaping leaders across disciplines since 1962. Our Alumni Management System was created to make it easier than ever for graduates and current students to stay connected, share opportunities, and mentor the next generation.</p>
+        <p>With AI-powered tools, we help students find the right mentors, discover career opportunities, and navigate their professional journeys with confidence.</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-md);margin-top:var(--space-xl);">
+          <div class="stat-card"><div class="stat-value">12,000+</div><div class="stat-label">Global Alumni</div></div>
+          <div class="stat-card"><div class="stat-value">60+</div><div class="stat-label">Countries Represented</div></div>
+          <div class="stat-card"><div class="stat-value">25+</div><div class="stat-label">Departments</div></div>
+          <div class="stat-card"><div class="stat-value">62</div><div class="stat-label">Years of Excellence</div></div>
+        </div>
+      </div>
+      <div>
+        <div style="background:var(--ivory);border-radius:var(--radius-xl);padding:var(--space-xl);border:1px solid var(--border);">
+          <h4 style="margin-bottom:var(--space-lg);">Our Values</h4>
+          
+          <div style="display:flex;align-items:center;gap:var(--space-md);padding:var(--space-md) 0;border-bottom:1px solid var(--border);">
+            <div style="width:40px;height:40px;border-radius:var(--radius-md);background:var(--gold-pale);color:var(--gold);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1.1rem;">
+              {% if forloop.counter == 1 %}⭐{% elif forloop.counter == 2 %}🤝{% elif forloop.counter == 3 %}💡{% elif forloop.counter == 4 %}🛡️{% else %}🌱{% endif %}
+            </div>
+            <div>
+              <div style="font-weight:600;color:var(--navy);font-size:0.9375rem;"></div>
+              <div style="font-size:0.8125rem;color:var(--text-muted);">A cornerstone of the Xavier's tradition</div>
+            </div>
+          </div>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section style="padding:var(--space-3xl) 0;background:var(--ivory);">
+  <div class="container">
+    <div class="section-header text-center">
+      <span class="section-eyebrow">Leadership</span>
+      <h2 class="section-title">Meet the Team</h2>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:var(--space-lg);">
+      {% for member in team_members %}
+      <div class="card text-center">
+        <div class="avatar avatar-lg" style="margin:0 auto var(--space-md);background:var(--navy);">{{ member.name.0 }}</div>
+        <h5>{{ member.name }}</h5>
+        <p style="font-size:0.8125rem;margin-top:4px;">{{ member.role }}</p>
+      </div>
+      {% empty %}
+      {% for i in "1234" %}
+      <div class="card text-center">
+        <div class="avatar avatar-lg" style="margin:0 auto var(--space-md);background:var(--navy);">{% if forloop.counter == 1 %}DR{% elif forloop.counter == 2 %}PK{% elif forloop.counter == 3 %}SM{% else %}AJ{% endif %}</div>
+        <h5>{% if forloop.counter == 1 %}Dr. Robert Xavier{% elif forloop.counter == 2 %}Prof. Kumar P.{% elif forloop.counter == 3 %}Dr. Sarah M.{% else %}Arun Jose{% endif %}</h5>
+        <p style="font-size:0.8125rem;margin-top:4px;">{% if forloop.counter == 1 %}Principal{% elif forloop.counter == 2 %}Alumni Coordinator{% elif forloop.counter == 3 %}Dean, Academics{% else %}IT Head{% endif %}</p>
+      </div>
+      {% endfor %}
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+
+{% comment %}
+==============================================================
+contact.html — rendered as separate file below
+==============================================================
+{% endcomment %}

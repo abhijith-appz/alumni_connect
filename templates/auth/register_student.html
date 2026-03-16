@@ -1,0 +1,222 @@
+{% extends "shared/base.html" %}
+{% block title %}Student Registration — {% endblock %}
+{% block navbar %}{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block content %}
+<div class="auth-page">
+  <div class="auth-left">
+    <div class="auth-left-inner">
+      <a href="{% url 'home' %}" class="auth-brand">
+        <div class="navbar-logo">A</div>
+        <div>
+          <div class="navbar-brand-name">AlumniConnect</div>
+          <div class="navbar-brand-sub">Vast</div>
+        </div>
+      </a>
+      <div class="auth-hero-text">
+        <h2>Join as<br><em style="color:var(--gold);font-style:italic;">Student</em></h2>
+        <p>Create your account and unlock access to our entire alumni network, job board, and AI career tools.</p>
+      </div>
+      <div style="background:rgba(200,169,110,0.1);border:1px solid rgba(200,169,110,0.2);border-radius:var(--radius-lg);padding:var(--space-lg);">
+        <h5 style="color:var(--ivory);margin-bottom:var(--space-md);">What you'll get</h5>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div style="display:flex;align-items:center;gap:10px;color:rgba(245,240,232,0.8);font-size:0.875rem;"><span style="color:var(--sage-light);">✓</span> Browse 12,000+ alumni profiles</div>
+          <div style="display:flex;align-items:center;gap:10px;color:rgba(245,240,232,0.8);font-size:0.875rem;"><span style="color:var(--sage-light);">✓</span> Access alumni-posted jobs</div>
+          <div style="display:flex;align-items:center;gap:10px;color:rgba(245,240,232,0.8);font-size:0.875rem;"><span style="color:var(--sage-light);">✓</span> AI-powered career guidance</div>
+          <div style="display:flex;align-items:center;gap:10px;color:rgba(245,240,232,0.8);font-size:0.875rem;"><span style="color:var(--sage-light);">✓</span> Message alumni directly</div>
+          <div style="display:flex;align-items:center;gap:10px;color:rgba(245,240,232,0.8);font-size:0.875rem;"><span style="color:var(--sage-light);">✓</span> Event registrations</div>
+        </div>
+      </div>
+      <div style="margin-top:auto;">
+        <p style="color:rgba(245,240,232,0.5);font-size:0.8rem;">Already have an account? <a href="{% url 'login' %}" style="color:var(--gold);">Sign in here</a></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="auth-right" style="overflow-y:auto;max-height:100vh;">
+    <div style="width:100%;max-width:500px;padding:var(--space-lg) 0;">
+      <div class="auth-card-header" style="margin-bottom:var(--space-xl);">
+        <h3 style="font-family:var(--font-display);font-size:1.75rem;color:var(--navy);">Create Student Account</h3>
+        <p style="color:var(--text-muted);font-size:0.9rem;margin-top:4px;">Fill in the details below to get started</p>
+      </div>
+
+      <!-- Progress -->
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:var(--space-xl);">
+        <div class="reg-step active" id="step1Indicator">1</div>
+        <div style="flex:1;height:2px;background:var(--border);border-radius:4px;overflow:hidden;">
+          <div id="progress1" style="width:0%;height:100%;background:var(--gold);transition:width 0.3s;"></div>
+        </div>
+        <div class="reg-step" id="step2Indicator">2</div>
+        <div style="flex:1;height:2px;background:var(--border);border-radius:4px;overflow:hidden;">
+          <div id="progress2" style="width:0%;height:100%;background:var(--gold);transition:width 0.3s;"></div>
+        </div>
+        <div class="reg-step" id="step3Indicator">3</div>
+      </div>
+
+      <form method="POST" action="{% url 'register_student' %}" enctype="multipart/form-data" id="regForm">
+        {% csrf_token %}
+
+        <!-- Step 1: Personal Info -->
+        <div id="formStep1">
+          <h5 style="margin-bottom:var(--space-md);color:var(--text-muted);">Step 1 of 3 — Personal Information</h5>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-md);">
+            <div class="form-group">
+              <label class="form-label">First Name *</label>
+              <input type="text" name="first_name" class="form-input" placeholder="John" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Last Name *</label>
+              <input type="text" name="last_name" class="form-input" placeholder="Doe" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email Address *</label>
+            <input type="email" name="email" class="form-input" placeholder="john@stxaviers.edu" required>
+            <p style="font-size:0.75rem;color:var(--text-muted);margin-top:4px;">Use your university email for faster verification</p>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Phone Number</label>
+            <input type="tel" name="phone" class="form-input" placeholder="+91 9876543210">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Profile Photo</label>
+            <input type="file" name="photo" class="form-input" accept="image/*">
+          </div>
+          <button type="button" class="btn btn-gold btn-lg" style="width:100%;" onclick="nextStep(1)">
+            Next: Academic Details <i class="fas fa-arrow-right"></i>
+          </button>
+        </div>
+
+        <!-- Step 2: Academic Info -->
+        <div id="formStep2" style="display:none;">
+          <h5 style="margin-bottom:var(--space-md);color:var(--text-muted);">Step 2 of 3 — Academic Details</h5>
+          <div class="form-group">
+            <label class="form-label">Student ID *</label>
+            <input type="text" name="student_id" class="form-input" placeholder="SX2024001" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Department *</label>
+            <select name="department" class="form-select" required>
+              <option value="">Select Department</option>
+              {% for dept in departments %}
+              <option value="{{ dept.id }}">{{ dept.name }}</option>
+              {% empty %}
+              <option value="cs">Computer Science</option>
+              <option value="mba">Management</option>
+              <option value="eng">Engineering</option>
+              <option value="law">Law</option>
+              <option value="arts">Arts & Humanities</option>
+              <option value="sci">Science</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-md);">
+            <div class="form-group">
+              <label class="form-label">Current Year *</label>
+              <select name="current_year" class="form-select" required>
+                <option value="1">1st Year</option>
+                <option value="2">2nd Year</option>
+                <option value="3">3rd Year</option>
+                <option value="4">4th Year</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Expected Graduation</label>
+              <input type="number" name="expected_graduation" class="form-input" placeholder="2027" min="2024" max="2035">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Areas of Interest</label>
+            <input type="text" name="interests" class="form-input" placeholder="e.g. Machine Learning, Finance, Design">
+          </div>
+          <div style="display:flex;gap:var(--space-md);">
+            <button type="button" class="btn btn-ghost btn-lg" style="flex:1;" onclick="prevStep(2)"><i class="fas fa-arrow-left"></i> Back</button>
+            <button type="button" class="btn btn-gold btn-lg" style="flex:2;" onclick="nextStep(2)">Next: Set Password <i class="fas fa-arrow-right"></i></button>
+          </div>
+        </div>
+
+        <!-- Step 3: Credentials -->
+        <div id="formStep3" style="display:none;">
+          <h5 style="margin-bottom:var(--space-md);color:var(--text-muted);">Step 3 of 3 — Set Your Password</h5>
+          <div class="form-group">
+            <label class="form-label">Username *</label>
+            <input type="text" name="username" class="form-input" placeholder="john_doe24" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Password *</label>
+            <div style="position:relative;">
+              <input type="password" name="password1" id="pwd1" class="form-input" placeholder="Min. 8 characters" required>
+              <button type="button" class="pwd-toggle" onclick="togglePwd('pwd1',this)" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text-muted);"><i class="fas fa-eye"></i></button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Confirm Password *</label>
+            <div style="position:relative;">
+              <input type="password" name="password2" id="pwd2" class="form-input" placeholder="Repeat password" required>
+              <button type="button" class="pwd-toggle" onclick="togglePwd('pwd2',this)" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text-muted);"><i class="fas fa-eye"></i></button>
+            </div>
+          </div>
+          <div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:var(--space-lg);">
+            <input type="checkbox" name="agree_terms" id="terms" required style="width:16px;height:16px;accent-color:var(--gold);margin-top:2px;">
+            <label for="terms" style="font-size:0.875rem;color:var(--text-secondary);">I agree to the <a href="#" style="color:var(--gold);">Terms of Service</a> and <a href="#" style="color:var(--gold);">Privacy Policy</a></label>
+          </div>
+          <div style="display:flex;gap:var(--space-md);">
+            <button type="button" class="btn btn-ghost btn-lg" style="flex:1;" onclick="prevStep(3)"><i class="fas fa-arrow-left"></i> Back</button>
+            <button type="submit" class="btn btn-gold btn-lg" style="flex:2;"><i class="fas fa-user-plus"></i> Create Account</button>
+          </div>
+        </div>
+      </form>
+      <p style="text-align:center;margin-top:var(--space-lg);font-size:0.875rem;color:var(--text-muted);">
+        Are you an alumni? <a href="{% url 'register_alumni' %}" style="color:var(--gold);font-weight:600;">Register as Alumni</a>
+      </p>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block extra_css %}
+<style>
+.auth-page { display:grid; grid-template-columns:1fr 1fr; min-height:100vh; }
+.auth-left { background:linear-gradient(160deg,var(--navy) 0%,var(--navy-mid) 60%,#1a3a5c 100%); padding:var(--space-2xl); display:flex; align-items:stretch; position:relative; overflow:hidden; }
+.auth-left::before { content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(200,169,110,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(200,169,110,0.04) 1px,transparent 1px);background-size:40px 40px; }
+.auth-left-inner { display:flex;flex-direction:column;gap:var(--space-xl);max-width:440px;width:100%;position:relative;z-index:1; }
+.auth-brand { display:flex;align-items:center;gap:12px;color:var(--ivory); }
+.auth-hero-text h2 { font-family:var(--font-display);font-size:3rem;font-weight:300;color:var(--ivory);line-height:1.1; }
+.auth-hero-text p { color:rgba(245,240,232,0.65);margin-top:var(--space-md); }
+.auth-right { display:flex;align-items:flex-start;justify-content:center;padding:var(--space-2xl);background:var(--ivory); }
+.reg-step {
+  width:32px;height:32px;border-radius:50%;
+  background:var(--border);color:var(--text-muted);
+  display:flex;align-items:center;justify-content:center;
+  font-size:0.8rem;font-weight:600;
+  transition:all var(--transition);flex-shrink:0;
+}
+.reg-step.active { background:var(--gold);color:var(--navy); }
+.reg-step.done { background:var(--sage);color:white; }
+.pwd-toggle { cursor:pointer; }
+@media(max-width:768px){.auth-page{grid-template-columns:1fr;}.auth-left{display:none;}.auth-right{padding:var(--space-lg);}}
+</style>
+{% endblock %}
+{% block extra_js %}
+<script>
+function togglePwd(id,btn){
+  const inp=document.getElementById(id);
+  inp.type=inp.type==='password'?'text':'password';
+  btn.innerHTML=inp.type==='text'?'<i class="fas fa-eye-slash"></i>':'<i class="fas fa-eye"></i>';
+}
+function nextStep(current) {
+  document.getElementById('formStep'+current).style.display='none';
+  document.getElementById('formStep'+(current+1)).style.display='block';
+  document.getElementById('step'+current+'Indicator').classList.add('done');
+  document.getElementById('step'+(current+1)+'Indicator').classList.add('active');
+  document.getElementById('progress'+current).style.width='100%';
+}
+function prevStep(current) {
+  document.getElementById('formStep'+current).style.display='none';
+  document.getElementById('formStep'+(current-1)).style.display='block';
+  document.getElementById('step'+current+'Indicator').classList.remove('active');
+  document.getElementById('step'+(current-1)+'Indicator').classList.remove('done');
+  document.getElementById('progress'+(current-1)).style.width='0%';
+}
+</script>
+{% endblock %}

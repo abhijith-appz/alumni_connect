@@ -1,0 +1,79 @@
+{% extends "shared/dashboard_base.html" %}
+{% block page_title %}Events{% endblock %}
+{% block breadcrumb %}Home / <span>Events</span>{% endblock %}
+{% block sidebar_nav %}{% include "student/partials/sidebar.html" %}{% endblock %}
+
+{% block dashboard_content %}
+<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-xl);flex-wrap:wrap;gap:var(--space-md);">
+  <div><h3>Upcoming Events</h3><p style="color:var(--text-muted);font-size:0.9rem;">Alumni events, webinars, workshops &amp; reunions</p></div>
+</div>
+<!-- Tabs -->
+<div class="tabs">
+  <div class="tabs-list">
+    <button class="tab-item active" onclick="filterEvents('all',this)">All Events</button>
+    <button class="tab-item" onclick="filterEvents('online',this)">Online</button>
+    <button class="tab-item" onclick="filterEvents('campus',this)">On Campus</button>
+    <button class="tab-item" onclick="filterEvents('registered',this)">My Registrations</button>
+  </div>
+</div>
+<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:var(--space-lg);" id="eventsGrid">
+  {% for event in events %}
+  <div class="event-card" data-type="{{ event.event_type }}">
+    <div class="event-card-img" style="background:linear-gradient(135deg,var(--navy),var(--navy-light));">
+      <span style="font-size:3rem;">{% if event.event_type == 'online' %}💻{% else %}🏛️{% endif %}</span>
+      <span class="badge {% if event.event_type == 'online' %}badge-sage{% else %}badge-navy{% endif %}" style="position:absolute;top:12px;right:12px;">{{ event.event_type|title }}</span>
+    </div>
+    <div class="event-card-body">
+      <div class="event-date-badge"><i class="fas fa-calendar"></i> {{ event.date }}</div>
+      <h4 style="margin:var(--space-sm) 0;">{{ event.title }}</h4>
+      <p style="font-size:0.875rem;color:var(--text-muted);margin-bottom:var(--space-md);">{{ event.description|truncatewords:20 }}</p>
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <div style="font-size:0.8rem;color:var(--text-muted);"><i class="fas fa-map-marker-alt"></i> {{ event.location }}</div>
+        <a href="{% url 'event_detail' event.pk %}" class="btn btn-gold btn-sm">Register</a>
+      </div>
+    </div>
+  </div>
+  {% empty %}
+  {% for e in "123456" %}
+  <div class="event-card" data-type="{% if forloop.counter <= 3 %}online{% else %}campus{% endif %}">
+    <div class="event-card-img" style="background:linear-gradient(135deg,{% if forloop.counter <= 3 %}var(--sage),var(--sage-light){% else %}var(--navy),var(--navy-light){% endif %});">
+      <span style="font-size:3rem;">{% if forloop.counter <= 3 %}💻{% else %}🏛️{% endif %}</span>
+      <span class="badge {% if forloop.counter <= 3 %}badge-sage{% else %}badge-navy{% endif %}" style="position:absolute;top:12px;right:12px;">{% if forloop.counter <= 3 %}Online{% else %}On Campus{% endif %}</span>
+    </div>
+    <div class="event-card-body">
+      <div class="event-date-badge"><i class="fas fa-calendar"></i> {% if forloop.counter == 1 %}Aug 18, 2024{% elif forloop.counter == 2 %}Aug 24, 2024{% elif forloop.counter == 3 %}Sep 5, 2024{% elif forloop.counter == 4 %}Sep 15, 2024{% elif forloop.counter == 5 %}Oct 2, 2024{% else %}Oct 20, 2024{% endif %}</div>
+      <h4 style="margin:var(--space-sm) 0;">{% if forloop.counter == 1 %}Annual Alumni Meet 2024{% elif forloop.counter == 2 %}Career Fair Webinar{% elif forloop.counter == 3 %}AI in Industry: Tech Talk{% elif forloop.counter == 4 %}Startup Founders Panel{% elif forloop.counter == 5 %}Resume Workshop{% else %}Alumni Reunion — Batch 2018{% endif %}</h4>
+      <p style="font-size:0.875rem;color:var(--text-muted);margin-bottom:var(--space-md);">{% if forloop.counter == 1 %}Connect with fellow alumni and current students at our flagship annual event.{% elif forloop.counter == 2 %}Explore career opportunities across 30+ companies with alumni hiring managers.{% elif forloop.counter == 3 %}Industry experts discuss the role of AI across different sectors.{% elif forloop.counter == 4 %}Learn from successful alumni entrepreneurs about their journeys.{% elif forloop.counter == 5 %}Craft a standout resume with guidance from alumni HR professionals.{% else %}Special reunion for the batch of 2018 — 6 years on!{% endif %}</p>
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <div style="font-size:0.8rem;color:var(--text-muted);"><i class="fas fa-map-marker-alt"></i> {% if forloop.counter <= 3 %}Online — Zoom{% else %}Main Campus{% endif %}</div>
+        <a href="#" class="btn btn-gold btn-sm">Register</a>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+  {% endfor %}
+</div>
+{% endblock %}
+{% block extra_css %}
+<style>
+.event-card { background:var(--white);border:1px solid var(--border);border-radius:var(--radius-xl);overflow:hidden;transition:all var(--transition); }
+.event-card:hover { transform:translateY(-3px);box-shadow:var(--shadow-md);border-color:var(--border-gold); }
+.event-card-img { height:160px;display:flex;align-items:center;justify-content:center;position:relative; }
+.event-card-body { padding:var(--space-lg); }
+.event-date-badge { font-size:0.775rem;font-weight:600;color:var(--gold);letter-spacing:0.04em; }
+</style>
+{% endblock %}
+{% block extra_js %}
+<script>
+function filterEvents(type, btn) {
+  document.querySelectorAll('.tab-item').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.event-card').forEach(c=>{
+    c.style.display=(type==='all'||c.dataset.type===type)?'block':'none';
+  });
+}
+</script>
+{% endblock %}
+
+
+{# ============ event_detail.html ============ #}

@@ -1,0 +1,751 @@
+{% extends "shared/base.html" %}
+{% load static %}
+
+{% block title %}Home — {% endblock %}
+{% block body_class %}home-page{% endblock %}
+
+{% block ai_fab %}
+<a href="{% url 'ai_chat' %}" class="ai-fab" title="Ask AI Assistant">
+  <i class="fas fa-robot"></i>
+</a>
+{% endblock %}
+
+{% block content %}
+
+<!-- ══════════════════════════════════════════
+     HERO SECTION
+══════════════════════════════════════════ -->
+<section class="hero">
+  <div class="hero-bg">
+    <div class="hero-orb hero-orb-1"></div>
+    <div class="hero-orb hero-orb-2"></div>
+    <div class="hero-grid-pattern"></div>
+  </div>
+  <div class="container hero-inner">
+    <div class="hero-content">
+      <div class="hero-eyebrow">
+        <span class="dot"></span>
+        Est. 1962 · Connecting Generations
+      </div>
+      <h1 class="hero-title">
+        Where Alumni&nbsp;<em>Inspire</em><br>
+        & Students&nbsp;<em>Thrive</em>
+      </h1>
+      <p class="hero-desc">
+        The official alumni network of Vast — powered by AI to connect students with thousands of alumni mentors, job opportunities, and career guidance.
+      </p>
+      <div class="hero-cta">
+        <a href="{% url 'register_student' %}" class="btn btn-gold btn-lg">
+          <i class="fas fa-user-graduate"></i> Join as Student
+        </a>
+        <a href="{% url 'register_alumni' %}" class="btn btn-outline btn-lg" style="color:var(--ivory); border-color:rgba(245,240,232,0.45);">
+          <i class="fas fa-university"></i> Join as Alumni
+        </a>
+      </div>
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <span class="hero-stat-value">12,000+</span>
+          <span class="hero-stat-label">Alumni</span>
+        </div>
+        <div class="hero-stat-divider"></div>
+        <div class="hero-stat">
+          <span class="hero-stat-value">3,500+</span>
+          <span class="hero-stat-label">Students</span>
+        </div>
+        <div class="hero-stat-divider"></div>
+        <div class="hero-stat">
+          <span class="hero-stat-value">850+</span>
+          <span class="hero-stat-label">Job Postings</span>
+        </div>
+        <div class="hero-stat-divider"></div>
+        <div class="hero-stat">
+          <span class="hero-stat-value">60+</span>
+          <span class="hero-stat-label">Countries</span>
+        </div>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="hero-card-stack">
+        <div class="floating-card fc-1">
+          <div class="fc-icon" style="background:var(--gold-pale); color:var(--gold);">💼</div>
+          <div>
+            <div class="fc-title">New Job Posted</div>
+            <div class="fc-sub">Senior Developer @ Google</div>
+          </div>
+        </div>
+        <div class="floating-card fc-2">
+          <div class="fc-icon" style="background:rgba(74,124,111,0.15); color:var(--sage);">🎓</div>
+          <div>
+            <div class="fc-title">Alumni Mentorship</div>
+            <div class="fc-sub">Dr. Sarah K. is available</div>
+          </div>
+        </div>
+        <div class="floating-card fc-3">
+          <div class="fc-icon" style="background:rgba(15,31,61,0.1); color:var(--navy);">🤖</div>
+          <div>
+            <div class="fc-title">AI Career Guide</div>
+            <div class="fc-sub">Get personalized advice</div>
+          </div>
+        </div>
+        <div class="hero-avatar-ring">
+          <div class="center-avatar">A</div>
+          {% for i in "12345678" %}
+          <div class="ring-avatar ra-{{ forloop.counter }}" style="transform: rotate({{ forloop.counter0 }}deg) translate(80px) rotate(-{{ forloop.counter0 }}deg);">
+            {{ forloop.counter }}
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     QUICK NAVIGATION LINKS
+══════════════════════════════════════════ -->
+<section class="quick-links-section">
+  <div class="container">
+    <div class="quick-links-grid">
+      <a href="{% url 'alumni_directory' %}" class="quick-link-card">
+        <div class="qlc-icon" style="background:var(--gold-pale); color:var(--gold);">
+          <i class="fas fa-address-book"></i>
+        </div>
+        <div class="qlc-text">
+          <h5>Alumni Directory</h5>
+          <p>Browse our community</p>
+        </div>
+        <i class="fas fa-arrow-right qlc-arrow"></i>
+      </a>
+      <a href="{% url 'student_jobs' %}" class="quick-link-card">
+        <div class="qlc-icon" style="background:rgba(74,124,111,0.12); color:var(--sage);">
+          <i class="fas fa-briefcase"></i>
+        </div>
+        <div class="qlc-text">
+          <h5>Job Opportunities</h5>
+          <p>Posted by alumni</p>
+        </div>
+        <i class="fas fa-arrow-right qlc-arrow"></i>
+      </a>
+      <a href="{% url 'student_events' %}" class="quick-link-card">
+        <div class="qlc-icon" style="background:rgba(15,31,61,0.08); color:var(--navy);">
+          <i class="fas fa-calendar-alt"></i>
+        </div>
+        <div class="qlc-text">
+          <h5>Events</h5>
+          <p>Upcoming gatherings</p>
+        </div>
+        <i class="fas fa-arrow-right qlc-arrow"></i>
+      </a>
+      <a href="{% url 'ai_chat' %}" class="quick-link-card">
+        <div class="qlc-icon" style="background:linear-gradient(135deg, var(--gold-pale), rgba(74,124,111,0.12)); color:var(--navy);">
+          <i class="fas fa-robot"></i>
+        </div>
+        <div class="qlc-text">
+          <h5>AI Assistant</h5>
+          <p>Get instant guidance</p>
+        </div>
+        <i class="fas fa-arrow-right qlc-arrow"></i>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     FEATURES SECTION
+══════════════════════════════════════════ -->
+<section class="features-section">
+  <div class="container">
+    <div class="section-header text-center">
+      <span class="section-eyebrow">Why AlumniConnect</span>
+      <h2 class="section-title">Everything You Need to<br>Succeed After Graduation</h2>
+      <div class="section-divider" style="margin:var(--space-md) auto;"></div>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon"><i class="fas fa-network-wired"></i></div>
+        <h4>Powerful Networking</h4>
+        <p>Connect with thousands of alumni worldwide across diverse industries and roles.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:rgba(74,124,111,0.12); color:var(--sage);"><i class="fas fa-briefcase"></i></div>
+        <h4>Exclusive Job Board</h4>
+        <p>Access jobs and internships shared exclusively by our alumni community.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:rgba(15,31,61,0.08); color:var(--navy);"><i class="fas fa-robot"></i></div>
+        <h4>AI Career Guidance</h4>
+        <p>Get personalized career paths, skill recommendations, and mentor suggestions.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:rgba(176,58,46,0.08); color:var(--crimson);"><i class="fas fa-calendar-check"></i></div>
+        <h4>Events & Reunions</h4>
+        <p>Stay updated with alumni events, webinars, workshops, and campus reunions.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:rgba(200,169,110,0.15); color:#8b6914;"><i class="fas fa-comments"></i></div>
+        <h4>Direct Messaging</h4>
+        <p>Reach out directly to alumni mentors for advice, referrals, and guidance.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:rgba(74,124,111,0.12); color:var(--sage);"><i class="fas fa-chart-line"></i></div>
+        <h4>Career Analytics</h4>
+        <p>Track industry trends and see where St. Xavier's graduates are succeeding.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     RECENT ALUMNI SPOTLIGHT
+══════════════════════════════════════════ -->
+<section class="spotlight-section">
+  <div class="container">
+    <div class="section-header d-flex justify-between align-center">
+      <div>
+        <span class="section-eyebrow">Alumni Spotlight</span>
+        <h2 class="section-title">Meet Our Community</h2>
+      </div>
+      <a href="{% url 'alumni_directory' %}" class="btn btn-outline">View All Alumni</a>
+    </div>
+    <div class="alumni-spotlight-grid">
+      {% for alumni in featured_alumni %}
+      <div class="spotlight-card">
+        <div class="sc-top">
+          <div class="avatar avatar-lg" style="background:var(--navy);">{{ alumni.user.first_name.0 }}{{ alumni.user.last_name.0 }}</div>
+          <div>
+            <div class="sc-name">{{ alumni.user.get_full_name }}</div>
+            <div class="sc-role">{{ alumni.current_position }}</div>
+            <div class="sc-company"><i class="fas fa-building" style="font-size:0.75rem;"></i> {{ alumni.company }}</div>
+          </div>
+        </div>
+        <div class="sc-meta">
+          <span class="badge badge-navy">{{ alumni.department }}</span>
+          <span class="badge badge-gold">Class of {{ alumni.graduation_year }}</span>
+        </div>
+        <a href="{% url 'alumni_profile_public' alumni.pk %}" class="btn btn-outline btn-sm" style="width:100%; justify-content:center;">View Profile</a>
+      </div>
+      {% empty %}
+      {% for i in "123456" %}
+      <div class="spotlight-card">
+        <div class="sc-top">
+          <div class="avatar avatar-lg" style="background:var(--navy);">
+            {% if forloop.counter == 1 %}AK{% elif forloop.counter == 2 %}SR{% elif forloop.counter == 3 %}MP{% elif forloop.counter == 4 %}RN{% elif forloop.counter == 5 %}PT{% else %}DV{% endif %}
+          </div>
+          <div>
+            <div class="sc-name">{% if forloop.counter == 1 %}Anil Kumar{% elif forloop.counter == 2 %}Sunita Rao{% elif forloop.counter == 3 %}Mohan Pillai{% elif forloop.counter == 4 %}Riya Nair{% elif forloop.counter == 5 %}Priya Thomas{% else %}Dev Varma{% endif %}</div>
+            <div class="sc-role">{% if forloop.counter == 1 %}Senior Engineer{% elif forloop.counter == 2 %}Product Manager{% elif forloop.counter == 3 %}Data Scientist{% elif forloop.counter == 4 %}UX Designer{% elif forloop.counter == 5 %}Consultant{% else %}Entrepreneur{% endif %}</div>
+            <div class="sc-company"><i class="fas fa-building" style="font-size:0.75rem;"></i> {% if forloop.counter == 1 %}Google{% elif forloop.counter == 2 %}Microsoft{% elif forloop.counter == 3 %}Amazon{% elif forloop.counter == 4 %}Adobe{% elif forloop.counter == 5 %}Deloitte{% else %}Startup{% endif %}</div>
+          </div>
+        </div>
+        <div class="sc-meta">
+          <span class="badge badge-navy">{% if forloop.counter <= 3 %}Computer Science{% else %}Management{% endif %}</span>
+          <span class="badge badge-gold">Class of {% if forloop.counter == 1 %}2018{% elif forloop.counter == 2 %}2015{% elif forloop.counter == 3 %}2020{% elif forloop.counter == 4 %}2019{% elif forloop.counter == 5 %}2012{% else %}2021{% endif %}</span>
+        </div>
+        <a href="#" class="btn btn-outline btn-sm" style="width:100%; justify-content:center;">View Profile</a>
+      </div>
+      {% endfor %}
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     AI SECTION
+══════════════════════════════════════════ -->
+<section class="ai-section">
+  <div class="container">
+    <div class="ai-section-inner">
+      <div class="ai-section-content">
+        <span class="section-eyebrow" style="color:var(--gold-light);">AI-Powered Platform</span>
+        <h2 style="color:var(--ivory); margin-bottom:var(--space-md);">
+          Your Personal Career<br><em style="color:var(--gold);">Intelligence Partner</em>
+        </h2>
+        <p style="color:rgba(245,240,232,0.7); margin-bottom:var(--space-lg);">
+          Our AI assistant helps you find the right alumni mentors, recommends career paths tailored to your skills, and answers questions about the platform 24/7.
+        </p>
+        <div class="ai-feature-list">
+          <div class="ai-feat"><i class="fas fa-check-circle"></i> Career path recommendations</div>
+          <div class="ai-feat"><i class="fas fa-check-circle"></i> Smart alumni matching</div>
+          <div class="ai-feat"><i class="fas fa-check-circle"></i> Job & internship suggestions</div>
+          <div class="ai-feat"><i class="fas fa-check-circle"></i> 24/7 platform assistance</div>
+        </div>
+        <a href="{% url 'ai_chat' %}" class="btn btn-gold btn-lg" style="margin-top:var(--space-lg);">
+          <i class="fas fa-robot"></i> Try AI Assistant
+        </a>
+      </div>
+      <div class="ai-chat-preview">
+        <div class="acp-header">
+          <div class="acp-dot red"></div>
+          <div class="acp-dot yellow"></div>
+          <div class="acp-dot green"></div>
+          <span style="margin-left:auto; font-size:0.75rem; color:rgba(245,240,232,0.5);">AI Assistant</span>
+        </div>
+        <div class="acp-messages">
+          <div class="acp-msg acp-bot">
+            <div class="acp-avatar">🤖</div>
+            <div class="acp-bubble">Hello! I'm your AI career guide. What field are you interested in?</div>
+          </div>
+          <div class="acp-msg acp-user">
+            <div class="acp-bubble">I want to work in data science at a tech company</div>
+          </div>
+          <div class="acp-msg acp-bot">
+            <div class="acp-avatar">🤖</div>
+            <div class="acp-bubble">Great choice! I found 3 alumni at Google, Amazon, and Netflix in data science. Shall I connect you with them?</div>
+          </div>
+          <div class="acp-typing">
+            <div class="acp-avatar">🤖</div>
+            <div class="typing-dots"><span></span><span></span><span></span></div>
+          </div>
+        </div>
+        <div class="acp-input">
+          <input type="text" placeholder="Ask me anything…" disabled>
+          <button><i class="fas fa-paper-plane"></i></button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     RECENT JOBS
+══════════════════════════════════════════ -->
+<section class="jobs-preview-section">
+  <div class="container">
+    <div class="section-header d-flex justify-between align-center">
+      <div>
+        <span class="section-eyebrow">Job Board</span>
+        <h2 class="section-title">Latest Opportunities</h2>
+      </div>
+      <a href="{% url 'student_jobs' %}" class="btn btn-outline">View All Jobs</a>
+    </div>
+    <div class="jobs-preview-grid">
+      {% for job in recent_jobs %}
+      <a href="{% url 'job_detail' job.pk %}" class="job-preview-card">
+        <div class="jpc-top">
+          <div class="jpc-logo">{{ job.company.0 }}</div>
+          <div>
+            <div class="jpc-title">{{ job.title }}</div>
+            <div class="jpc-company">{{ job.company }}</div>
+          </div>
+          <span class="badge {% if job.type == 'Full Time' %}badge-navy{% else %}badge-gold{% endif %}" style="margin-left:auto;">{{ job.type }}</span>
+        </div>
+        <div class="jpc-meta">
+          <span><i class="fas fa-map-marker-alt"></i> {{ job.location }}</span>
+          <span><i class="fas fa-clock"></i> {{ job.posted_at|timesince }} ago</span>
+        </div>
+      </a>
+      {% empty %}
+      {% for i in "12345" %}
+      <a href="#" class="job-preview-card">
+        <div class="jpc-top">
+          <div class="jpc-logo">{% if forloop.counter == 1 %}G{% elif forloop.counter == 2 %}M{% elif forloop.counter == 3 %}A{% elif forloop.counter == 4 %}F{% else %}T{% endif %}</div>
+          <div>
+            <div class="jpc-title">{% if forloop.counter == 1 %}Software Engineer{% elif forloop.counter == 2 %}Product Manager{% elif forloop.counter == 3 %}Data Analyst{% elif forloop.counter == 4 %}UX Designer{% else %}ML Engineer{% endif %}</div>
+            <div class="jpc-company">{% if forloop.counter == 1 %}Google{% elif forloop.counter == 2 %}Microsoft{% elif forloop.counter == 3 %}Amazon{% elif forloop.counter == 4 %}Facebook{% else %}Tesla{% endif %}</div>
+          </div>
+          <span class="badge {% if forloop.counter <= 3 %}badge-navy{% else %}badge-gold{% endif %}" style="margin-left:auto;">{% if forloop.counter <= 3 %}Full Time{% else %}Internship{% endif %}</span>
+        </div>
+        <div class="jpc-meta">
+          <span><i class="fas fa-map-marker-alt"></i> Bangalore, India</span>
+          <span><i class="fas fa-clock"></i> 2 days ago</span>
+        </div>
+      </a>
+      {% endfor %}
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     CTA SECTION
+══════════════════════════════════════════ -->
+<section class="cta-section">
+  <div class="container">
+    <div class="cta-inner">
+      <h2>Ready to Join the Network?</h2>
+      <p>Thousands of St. Xavier's graduates are already connecting, mentoring, and growing together.</p>
+      <div class="cta-buttons">
+        <a href="{% url 'register_student' %}" class="btn btn-gold btn-lg">Get Started Free</a>
+        <a href="{% url 'about' %}" class="btn btn-outline btn-lg" style="color:var(--navy); border-color:var(--navy);">Learn More</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}
+
+{% block extra_css %}
+<style>
+/* ── Hero ── */
+.hero {
+  background: linear-gradient(135deg, var(--navy) 0%, var(--navy-mid) 60%, #1a3a5c 100%);
+  padding: var(--space-3xl) 0 var(--space-3xl);
+  position: relative;
+  overflow: hidden;
+  min-height: 90vh;
+  display: flex;
+  align-items: center;
+}
+.hero-bg { position: absolute; inset: 0; pointer-events: none; }
+.hero-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.15;
+}
+.hero-orb-1 { width: 500px; height: 500px; background: var(--gold); top: -100px; right: -50px; }
+.hero-orb-2 { width: 300px; height: 300px; background: var(--sage-light); bottom: 0; left: 10%; }
+.hero-grid-pattern {
+  position: absolute; inset: 0;
+  background-image: linear-gradient(rgba(200,169,110,0.04) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(200,169,110,0.04) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+.hero-inner {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3xl);
+  align-items: center;
+  position: relative;
+  z-index: 1;
+}
+.hero-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: var(--space-md);
+}
+.hero-eyebrow .dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--sage-light);
+  animation: blink 2s ease-in-out infinite;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+.hero-title {
+  font-family: var(--font-display);
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-weight: 300;
+  color: var(--ivory);
+  line-height: 1.1;
+  margin-bottom: var(--space-lg);
+}
+.hero-title em { font-style: italic; color: var(--gold); }
+.hero-desc { color: rgba(245,240,232,0.7); font-size: 1.0625rem; margin-bottom: var(--space-xl); max-width: 480px; }
+.hero-cta { display: flex; gap: var(--space-md); flex-wrap: wrap; margin-bottom: var(--space-xl); }
+.hero-stats { display: flex; align-items: center; gap: var(--space-lg); flex-wrap: wrap; }
+.hero-stat-value { font-family: var(--font-display); font-size: 1.75rem; font-weight: 600; color: var(--ivory); display: block; line-height: 1; }
+.hero-stat-label { font-size: 0.75rem; color: rgba(245,240,232,0.5); font-weight: 500; letter-spacing: 0.04em; }
+.hero-stat-divider { width: 1px; height: 40px; background: rgba(200,169,110,0.3); }
+
+/* Hero Visual */
+.hero-visual { display: flex; justify-content: center; align-items: center; }
+.hero-card-stack { position: relative; width: 350px; height: 400px; }
+.floating-card {
+  position: absolute;
+  background: rgba(255,255,255,0.08);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(200,169,110,0.2);
+  border-radius: var(--radius-lg);
+  padding: 14px var(--space-md);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  animation: float 4s ease-in-out infinite;
+}
+.fc-1 { top: 20px; right: 0; width: 220px; animation-delay: 0s; }
+.fc-2 { top: 120px; left: 0; width: 230px; animation-delay: 1.3s; }
+.fc-3 { bottom: 60px; right: 20px; width: 210px; animation-delay: 0.7s; }
+@keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+.fc-icon { width: 40px; height: 40px; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0; }
+.fc-title { font-size: 0.8rem; font-weight: 600; color: var(--ivory); }
+.fc-sub { font-size: 0.7rem; color: rgba(245,240,232,0.6); }
+.hero-avatar-ring {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 200px; height: 200px;
+}
+.center-avatar {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 60px; height: 60px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--gold), var(--gold-light));
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-display);
+  font-size: 1.25rem; font-weight: 700;
+  color: var(--navy);
+  box-shadow: 0 0 0 3px rgba(200,169,110,0.3), 0 0 40px rgba(200,169,110,0.2);
+}
+.ring-avatar {
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: var(--navy-light);
+  border: 2px solid rgba(200,169,110,0.4);
+  color: var(--gold);
+  font-size: 0.7rem;
+  font-family: var(--font-display);
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 600;
+  margin-top: -16px; margin-left: -16px;
+}
+
+/* Quick Links */
+.quick-links-section {
+  background: var(--white);
+  padding: var(--space-xl) 0;
+  border-bottom: 1px solid var(--border);
+}
+.quick-links-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-md);
+}
+.quick-link-card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  transition: all var(--transition);
+  background: var(--white);
+}
+.quick-link-card:hover {
+  border-color: var(--border-gold);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+.qlc-icon {
+  width: 44px; height: 44px;
+  border-radius: var(--radius-md);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+.qlc-text h5 { font-size: 0.9rem; color: var(--navy); margin-bottom: 2px; }
+.qlc-text p { font-size: 0.75rem; color: var(--text-muted); }
+.qlc-arrow { margin-left: auto; color: var(--text-muted); font-size: 0.85rem; transition: transform var(--transition); }
+.quick-link-card:hover .qlc-arrow { transform: translateX(4px); color: var(--gold); }
+
+/* Features */
+.features-section { padding: var(--space-3xl) 0; background: var(--ivory); }
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-lg);
+}
+.feature-card {
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  padding: var(--space-xl);
+  border: 1px solid var(--border);
+  transition: all var(--transition);
+}
+.feature-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--border-gold);
+}
+.feature-icon {
+  width: 48px; height: 48px;
+  border-radius: var(--radius-md);
+  background: var(--gold-pale);
+  color: var(--gold);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.25rem;
+  margin-bottom: var(--space-md);
+}
+.feature-card h4 { margin-bottom: 8px; font-size: 1.1rem; }
+.feature-card p { font-size: 0.9rem; }
+
+/* Spotlight */
+.spotlight-section { padding: var(--space-3xl) 0; background: var(--ivory-dark); }
+.alumni-spotlight-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-lg); }
+.spotlight-card {
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  border: 1px solid var(--border);
+  display: flex; flex-direction: column; gap: var(--space-md);
+  transition: all var(--transition);
+}
+.spotlight-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
+.sc-top { display: flex; align-items: flex-start; gap: var(--space-md); }
+.sc-name { font-weight: 600; font-size: 1rem; color: var(--navy); font-family: var(--font-display); }
+.sc-role { font-size: 0.825rem; color: var(--text-secondary); margin-top: 2px; }
+.sc-company { font-size: 0.775rem; color: var(--text-muted); margin-top: 2px; }
+.sc-meta { display: flex; gap: var(--space-sm); flex-wrap: wrap; }
+
+/* AI Section */
+.ai-section {
+  background: linear-gradient(135deg, var(--navy) 0%, var(--navy-mid) 100%);
+  padding: var(--space-3xl) 0;
+  position: relative;
+  overflow: hidden;
+}
+.ai-section::before {
+  content: '';
+  position: absolute;
+  top: 0; right: 0;
+  width: 400px; height: 400px;
+  background: radial-gradient(circle, rgba(200,169,110,0.12), transparent 70%);
+  pointer-events: none;
+}
+.ai-section-inner {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3xl);
+  align-items: center;
+  position: relative;
+  z-index: 1;
+}
+.ai-feature-list { display: flex; flex-direction: column; gap: 10px; }
+.ai-feat {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 0.9375rem;
+  color: rgba(245,240,232,0.8);
+}
+.ai-feat i { color: var(--sage-light); }
+
+/* AI Chat Preview */
+.ai-chat-preview {
+  background: rgba(255,255,255,0.06);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(200,169,110,0.2);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+}
+.acp-header {
+  display: flex; align-items: center; gap: 6px;
+  padding: 12px 16px;
+  background: rgba(0,0,0,0.2);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.acp-dot { width: 10px; height: 10px; border-radius: 50%; }
+.acp-dot.red { background: #ff5f57; }
+.acp-dot.yellow { background: #febc2e; }
+.acp-dot.green { background: #28c840; }
+.acp-messages { padding: var(--space-md); display: flex; flex-direction: column; gap: var(--space-md); min-height: 260px; }
+.acp-msg { display: flex; align-items: flex-end; gap: 8px; }
+.acp-msg.acp-user { flex-direction: row-reverse; }
+.acp-avatar { font-size: 1.25rem; flex-shrink: 0; }
+.acp-bubble {
+  padding: 10px 14px;
+  border-radius: 18px;
+  font-size: 0.875rem;
+  max-width: 240px;
+  line-height: 1.4;
+}
+.acp-bot .acp-bubble { background: rgba(255,255,255,0.12); color: rgba(245,240,232,0.9); border-bottom-left-radius: 4px; }
+.acp-user .acp-bubble { background: var(--gold); color: var(--navy); font-weight: 500; border-bottom-right-radius: 4px; }
+.typing-dots {
+  display: flex; align-items: center; gap: 4px;
+  padding: 12px 16px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 18px;
+  border-bottom-left-radius: 4px;
+}
+.typing-dots span {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: rgba(245,240,232,0.5);
+  animation: typingBounce 1.4s ease infinite;
+}
+.typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+.typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes typingBounce { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-6px)} }
+.acp-input {
+  display: flex; gap: 8px;
+  padding: 12px 16px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+}
+.acp-input input {
+  flex: 1; background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: var(--radius-full);
+  padding: 8px 16px; color: var(--ivory);
+  font-size: 0.875rem;
+}
+.acp-input input::placeholder { color: rgba(245,240,232,0.4); }
+.acp-input button {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: var(--gold);
+  color: var(--navy);
+  border: none;
+  font-size: 0.875rem;
+  flex-shrink: 0;
+}
+
+/* Jobs Preview */
+.jobs-preview-section { padding: var(--space-3xl) 0; background: var(--white); }
+.jobs-preview-grid { display: grid; grid-template-columns: repeat(1, 1fr); gap: var(--space-sm); }
+.job-preview-card {
+  display: flex; flex-direction: column; gap: var(--space-sm);
+  padding: var(--space-md);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--white);
+  transition: all var(--transition);
+}
+.job-preview-card:hover { border-color: var(--border-gold); box-shadow: var(--shadow-sm); }
+.jpc-top { display: flex; align-items: center; gap: 12px; }
+.jpc-logo {
+  width: 42px; height: 42px;
+  border-radius: var(--radius-md);
+  background: var(--navy);
+  color: var(--gold);
+  font-family: var(--font-display);
+  font-weight: 700; font-size: 1.1rem;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.jpc-title { font-weight: 600; font-size: 0.9375rem; color: var(--navy); }
+.jpc-company { font-size: 0.8125rem; color: var(--text-muted); }
+.jpc-meta { display: flex; gap: var(--space-md); font-size: 0.775rem; color: var(--text-muted); }
+.jpc-meta span { display: flex; align-items: center; gap: 4px; }
+
+/* CTA */
+.cta-section { padding: var(--space-3xl) 0; background: var(--ivory-dark); }
+.cta-inner {
+  text-align: center;
+  background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
+  border-radius: var(--radius-xl);
+  padding: var(--space-3xl);
+  position: relative;
+  overflow: hidden;
+}
+.cta-inner::before {
+  content: '';
+  position: absolute;
+  top: -50%; right: -10%;
+  width: 400px; height: 400px;
+  background: radial-gradient(circle, rgba(200,169,110,0.1), transparent 70%);
+}
+.cta-inner h2 { color: var(--ivory); margin-bottom: var(--space-md); }
+.cta-inner p { color: rgba(245,240,232,0.65); margin-bottom: var(--space-xl); }
+.cta-buttons { display: flex; justify-content: center; gap: var(--space-md); flex-wrap: wrap; }
+
+@media (max-width: 1024px) {
+  .hero-inner { grid-template-columns: 1fr; }
+  .hero-visual { display: none; }
+  .quick-links-grid { grid-template-columns: repeat(2, 1fr); }
+  .features-grid { grid-template-columns: repeat(2, 1fr); }
+  .alumni-spotlight-grid { grid-template-columns: repeat(2, 1fr); }
+  .ai-section-inner { grid-template-columns: 1fr; }
+}
+@media (max-width: 640px) {
+  .quick-links-grid, .features-grid, .alumni-spotlight-grid { grid-template-columns: 1fr; }
+}
+</style>
+{% endblock %}

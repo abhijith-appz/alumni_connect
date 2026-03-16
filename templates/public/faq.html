@@ -1,0 +1,102 @@
+{% extends "shared/base.html" %}
+{% block title %}FAQ — {% endblock %}
+{% block content %}
+<section style="background:linear-gradient(135deg,var(--navy),var(--navy-mid));padding:var(--space-3xl) 0;text-align:center;">
+  <div class="container">
+    <span class="section-eyebrow" style="color:var(--gold-light);">Help Center</span>
+    <h1 style="color:var(--ivory);margin-bottom:var(--space-md);">Frequently Asked Questions</h1>
+    <p style="color:rgba(245,240,232,0.7);max-width:500px;margin:0 auto;">Everything you need to know about AlumniConnect. Can't find your answer? <a href="{% url 'contact' %}" style="color:var(--gold);">Contact us</a>.</p>
+  </div>
+</section>
+<section style="padding:var(--space-3xl) 0;background:var(--white);">
+  <div class="container-sm">
+    <div class="tabs" style="margin-bottom:var(--space-xl);">
+      <div class="tabs-list">
+        <button class="tab-item active" onclick="filterFaq('all',this)">All</button>
+        <button class="tab-item" onclick="filterFaq('account',this)">Account</button>
+        <button class="tab-item" onclick="filterFaq('features',this)">Features</button>
+        <button class="tab-item" onclick="filterFaq('alumni',this)">Alumni</button>
+        <button class="tab-item" onclick="filterFaq('jobs',this)">Jobs</button>
+      </div>
+    </div>
+    <div id="faqList">
+      {% for faq in faqs %}
+      <div class="faq-item" data-cat="{{ faq.category }}">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          {{ faq.question }}
+          <i class="fas fa-chevron-down faq-icon"></i>
+        </button>
+        <div class="faq-a">{{ faq.answer }}</div>
+      </div>
+      {% empty %}
+      {% for qa in faq_data %}
+      <div class="faq-item" data-cat="{{ qa.cat }}">
+        <button class="faq-q" onclick="toggleFaq(this)">{{ qa.q }}<i class="fas fa-chevron-down faq-icon"></i></button>
+        <div class="faq-a">{{ qa.a }}</div>
+      </div>
+      {% empty %}
+      <div class="faq-item" data-cat="account"><button class="faq-q" onclick="toggleFaq(this)">How do I register as a student?<i class="fas fa-chevron-down faq-icon"></i></button><div class="faq-a">Click the "Register" button in the top navigation and select "Student Registration." Fill in your details and your student ID will be verified by our admin team within 24 hours.</div></div>
+      <div class="faq-item" data-cat="account"><button class="faq-q" onclick="toggleFaq(this)">How do alumni verify their accounts?<i class="fas fa-chevron-down faq-icon"></i></button><div class="faq-a">Alumni registrations are manually reviewed by our admin team to verify graduation records. You'll receive an email confirmation within 1–2 business days.</div></div>
+      <div class="faq-item" data-cat="features"><button class="faq-q" onclick="toggleFaq(this)">What is the AI Assistant and how does it work?<i class="fas fa-chevron-down faq-icon"></i></button><div class="faq-a">Our AI Assistant is powered by advanced language models to help you find alumni mentors, explore career paths, and get instant answers about the platform. It's available 24/7 from your dashboard.</div></div>
+      <div class="faq-item" data-cat="jobs"><button class="faq-q" onclick="toggleFaq(this)">Who can post jobs on the platform?<i class="fas fa-chevron-down faq-icon"></i></button><div class="faq-a">Only verified alumni can post job and internship opportunities. This ensures that all postings are legitimate and from people connected to our university community.</div></div>
+      <div class="faq-item" data-cat="alumni"><button class="faq-q" onclick="toggleFaq(this)">Can I message alumni directly?<i class="fas fa-chevron-down faq-icon"></i></button><div class="faq-a">Yes! Logged-in students can send messages to alumni who have enabled messaging on their profiles. Alumni can also choose to set their availability status for mentorship.</div></div>
+      <div class="faq-item" data-cat="features"><button class="faq-q" onclick="toggleFaq(this)">Is AlumniConnect free to use?<i class="fas fa-chevron-down faq-icon"></i></button><div class="faq-a">Yes, the platform is completely free for all St. Xavier's students and alumni. It is maintained by the university to support career development and community building.</div></div>
+      <div class="faq-item" data-cat="account"><button class="faq-q" onclick="toggleFaq(this)">How do I reset my password?<i class="fas fa-chevron-down faq-icon"></i></button><div class="faq-a">Click "Forgot Password" on the login page, enter your registered email, and you'll receive a password reset link within a few minutes. Check your spam folder if you don't see it.</div></div>
+      <div class="faq-item" data-cat="jobs"><button class="faq-q" onclick="toggleFaq(this)">How does the AI Job Recommendation work?<i class="fas fa-chevron-down faq-icon"></i></button><div class="faq-a">Our AI analyzes your profile, skills, department, and interests to suggest the most relevant jobs and internships from our alumni-posted listings.</div></div>
+      {% endfor %}
+      {% endfor %}
+    </div>
+
+    <div style="text-align:center;margin-top:var(--space-2xl);padding:var(--space-xl);background:var(--gold-pale);border-radius:var(--radius-xl);">
+      <h4>Still Have Questions?</h4>
+      <p style="margin-bottom:var(--space-md);">Our team is happy to help you with anything not covered here.</p>
+      <a href="{% url 'contact' %}" class="btn btn-gold">Contact Support</a>
+      &nbsp; or &nbsp;
+      <a href="{% url 'ai_chat' %}" class="btn btn-outline">Ask the AI Assistant</a>
+    </div>
+  </div>
+</section>
+{% endblock %}
+{% block extra_css %}
+<style>
+.faq-item { border-bottom: 1px solid var(--border); }
+.faq-q {
+  width:100%; text-align:left; background:none; border:none;
+  padding:var(--space-md) 0;
+  font-size:1rem; font-weight:500; color:var(--navy);
+  cursor:pointer; display:flex; justify-content:space-between; align-items:center;
+  gap:var(--space-md);
+  font-family:var(--font-display);
+  transition:color var(--transition);
+}
+.faq-q:hover { color:var(--gold); }
+.faq-icon { transition:transform var(--transition); flex-shrink:0; font-size:0.8rem; color:var(--text-muted); }
+.faq-q.open .faq-icon { transform:rotate(180deg); }
+.faq-a {
+  display:none;
+  padding:0 0 var(--space-md);
+  color:var(--text-secondary);
+  font-size:0.9375rem;
+  line-height:1.7;
+}
+.faq-a.open { display:block; animation: fadeIn 0.2s ease; }
+@keyframes fadeIn { from{opacity:0;transform:translateY(-4px)} to{opacity:1;transform:translateY(0)} }
+</style>
+{% endblock %}
+{% block extra_js %}
+<script>
+function toggleFaq(btn) {
+  const a = btn.nextElementSibling;
+  const isOpen = btn.classList.contains('open');
+  document.querySelectorAll('.faq-q.open').forEach(b=>{b.classList.remove('open');b.nextElementSibling.classList.remove('open');});
+  if(!isOpen){ btn.classList.add('open'); a.classList.add('open'); }
+}
+function filterFaq(cat, btn) {
+  document.querySelectorAll('.tab-item').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.faq-item').forEach(item=>{
+    item.style.display = (cat==='all'||item.dataset.cat===cat) ? 'block' : 'none';
+  });
+}
+</script>
+{% endblock %}

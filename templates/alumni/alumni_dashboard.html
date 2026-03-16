@@ -1,0 +1,166 @@
+{% extends "shared/dashboard_base.html" %}
+{% block page_title %}Alumni Dashboard{% endblock %}
+{% block breadcrumb %}Home / <span>Dashboard</span>{% endblock %}
+
+{% block sidebar_nav %}
+<p class="sidebar-section-label">Main</p>
+<a href="{% url 'alumni_dashboard' %}" class="sidebar-link active"><span class="link-icon"><i class="fas fa-th-large"></i></span> Dashboard</a>
+<a href="{% url 'alumni_profile' %}" class="sidebar-link"><span class="link-icon"><i class="fas fa-user"></i></span> My Profile</a>
+<a href="{% url 'edit_alumni_profile' %}" class="sidebar-link"><span class="link-icon"><i class="fas fa-edit"></i></span> Edit Profile</a>
+<p class="sidebar-section-label">Jobs</p>
+<a href="{% url 'post_job' %}" class="sidebar-link"><span class="link-icon"><i class="fas fa-plus-circle"></i></span> Post a Job</a>
+<a href="{% url 'manage_jobs' %}" class="sidebar-link"><span class="link-icon"><i class="fas fa-briefcase"></i></span> My Job Posts</a>
+<p class="sidebar-section-label">Students</p>
+<a href="{% url 'view_students' %}" class="sidebar-link"><span class="link-icon"><i class="fas fa-user-graduate"></i></span> Student Profiles</a>
+<p class="sidebar-section-label">Community</p>
+<a href="{% url 'alumni_network' %}" class="sidebar-link"><span class="link-icon"><i class="fas fa-network-wired"></i></span> Alumni Network</a>
+<a href="{% url 'alumni_events' %}" class="sidebar-link"><span class="link-icon"><i class="fas fa-calendar-alt"></i></span> Events</a>
+<p class="sidebar-section-label">Communication</p>
+<a href="{% url 'alumni_messages' %}" class="sidebar-link">
+  <span class="link-icon"><i class="fas fa-comments"></i></span> Messages
+  {% if unread_messages %}<span class="badge-count">{{ unread_messages }}</span>{% endif %}
+</a>
+<a href="{% url 'notifications' %}" class="sidebar-link"><span class="link-icon"><i class="fas fa-bell"></i></span> Notifications</a>
+<p class="sidebar-section-label">AI Tools</p>
+<a href="{% url 'ai_chat' %}" class="sidebar-link"><span class="link-icon"><i class="fas fa-robot"></i></span> AI Assistant</a>
+{% endblock %}
+
+{% block dashboard_content %}
+<!-- Welcome Banner -->
+<div style="background:linear-gradient(135deg,#1a2f5e 0%,var(--navy) 100%);border-radius:var(--radius-xl);padding:var(--space-xl);margin-bottom:var(--space-xl);position:relative;overflow:hidden;">
+  <div style="position:absolute;right:-20px;top:-20px;width:200px;height:200px;border-radius:50%;background:rgba(200,169,110,0.08);"></div>
+  <div style="position:absolute;right:60px;bottom:-40px;width:140px;height:140px;border-radius:50%;background:rgba(200,169,110,0.05);"></div>
+  <div style="position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:var(--space-md);">
+    <div style="display:flex;align-items:center;gap:var(--space-lg);">
+      <div class="avatar avatar-xl" style="background:var(--gold-pale);color:var(--gold);font-size:2rem;border:3px solid rgba(200,169,110,0.4);">
+        {% if user.photo %}<img src="{{ user.photo.url }}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">{% else %}{{ user.first_name.0 }}{{ user.last_name.0 }}{% endif %}
+      </div>
+      <div>
+        <p style="color:var(--gold);font-size:0.75rem;font-weight:600;letter-spacing:0.08em;margin-bottom:4px;">ALUMNI</p>
+        <h2 style="color:var(--ivory);margin-bottom:4px;">{{ user.get_full_name }}</h2>
+        <p style="color:rgba(245,240,232,0.65);font-size:0.9rem;">{{ user.alumni_profile.current_position|default:"Alumni" }} @ {{ user.alumni_profile.company|default:"Company" }}</p>
+        <p style="color:rgba(245,240,232,0.5);font-size:0.8rem;margin-top:2px;">{{ user.alumni_profile.department }} · Class of {{ user.alumni_profile.graduation_year }}</p>
+      </div>
+    </div>
+    <div style="display:flex;gap:var(--space-md);">
+      <a href="{% url 'post_job' %}" class="btn btn-gold"><i class="fas fa-plus"></i> Post Job</a>
+      <a href="{% url 'edit_alumni_profile' %}" class="btn btn-outline" style="color:var(--ivory);border-color:rgba(245,240,232,0.35);">Edit Profile</a>
+    </div>
+  </div>
+</div>
+
+<!-- Stats -->
+<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:var(--space-md);margin-bottom:var(--space-xl);">
+  <div class="stat-card">
+    <div style="display:flex;justify-content:space-between;margin-bottom:var(--space-sm);"><div class="stat-icon"><i class="fas fa-briefcase"></i></div></div>
+    <div class="stat-value">{{ active_jobs|default:3 }}</div>
+    <div class="stat-label">Active Job Posts</div>
+  </div>
+  <div class="stat-card">
+    <div style="display:flex;justify-content:space-between;margin-bottom:var(--space-sm);"><div class="stat-icon" style="background:rgba(74,124,111,0.12);color:var(--sage);"><i class="fas fa-eye"></i></div></div>
+    <div class="stat-value">{{ profile_views|default:124 }}</div>
+    <div class="stat-label">Profile Views</div>
+  </div>
+  <div class="stat-card">
+    <div style="display:flex;justify-content:space-between;margin-bottom:var(--space-sm);"><div class="stat-icon" style="background:rgba(15,31,61,0.08);color:var(--navy);"><i class="fas fa-user-graduate"></i></div></div>
+    <div class="stat-value">{{ students_mentoring|default:7 }}</div>
+    <div class="stat-label">Students Mentored</div>
+  </div>
+  <div class="stat-card">
+    <div style="display:flex;justify-content:space-between;margin-bottom:var(--space-sm);"><div class="stat-icon" style="background:rgba(200,169,110,0.15);color:#8b6914;"><i class="fas fa-comments"></i></div></div>
+    <div class="stat-value">{{ unread_messages|default:2 }}</div>
+    <div class="stat-label">Unread Messages</div>
+  </div>
+</div>
+
+<div style="display:grid;grid-template-columns:2fr 1fr;gap:var(--space-xl);">
+  <div>
+    <!-- My Job Posts -->
+    <div class="card" style="margin-bottom:var(--space-lg);">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-lg);">
+        <h4><i class="fas fa-briefcase" style="color:var(--gold);margin-right:8px;font-size:0.9rem;"></i>My Job Posts</h4>
+        <div style="display:flex;gap:var(--space-sm);">
+          <a href="{% url 'post_job' %}" class="btn btn-gold btn-sm"><i class="fas fa-plus"></i> New</a>
+          <a href="{% url 'manage_jobs' %}" class="btn btn-ghost btn-sm">Manage All</a>
+        </div>
+      </div>
+      {% for job in my_jobs %}
+      <div style="display:flex;align-items:center;gap:var(--space-md);padding:var(--space-md);border:1px solid var(--border);border-radius:var(--radius-md);margin-bottom:var(--space-sm);">
+        <div style="flex:1;">
+          <div style="font-weight:600;color:var(--navy);">{{ job.title }}</div>
+          <div style="font-size:0.8rem;color:var(--text-muted);">{{ job.location }} · {{ job.applications_count }} applicants</div>
+        </div>
+        <span class="badge {% if job.is_active %}badge-green{% else %}badge-navy{% endif %}">{% if job.is_active %}Active{% else %}Closed{% endif %}</span>
+        <a href="{% url 'edit_job' job.pk %}" class="btn btn-ghost btn-sm"><i class="fas fa-edit"></i></a>
+      </div>
+      {% empty %}
+      <div style="text-align:center;padding:var(--space-xl);color:var(--text-muted);">
+        <i class="fas fa-briefcase" style="font-size:2rem;opacity:0.3;display:block;margin-bottom:var(--space-md);"></i>
+        <p>No job posts yet.</p>
+        <a href="{% url 'post_job' %}" class="btn btn-gold btn-sm" style="margin-top:var(--space-md);">Post Your First Job</a>
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- Recent Student Messages -->
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-lg);">
+        <h4><i class="fas fa-comments" style="color:var(--gold);margin-right:8px;font-size:0.9rem;"></i>Student Messages</h4>
+        <a href="{% url 'alumni_messages' %}" class="btn btn-ghost btn-sm">View All</a>
+      </div>
+      {% for msg in recent_student_messages %}
+      <div style="display:flex;align-items:flex-start;gap:var(--space-md);padding:var(--space-md) 0;border-bottom:1px solid var(--border);">
+        <div class="avatar avatar-md" style="background:var(--navy);">{{ msg.sender.first_name.0 }}</div>
+        <div style="flex:1;">
+          <div style="display:flex;align-items:center;justify-content:space-between;">
+            <span style="font-weight:600;color:var(--navy);font-size:0.9rem;">{{ msg.sender.get_full_name }}</span>
+            <span style="font-size:0.75rem;color:var(--text-muted);">{{ msg.created_at|timesince }} ago</span>
+          </div>
+          <p style="font-size:0.875rem;color:var(--text-secondary);margin-top:2px;">{{ msg.preview }}</p>
+        </div>
+      </div>
+      {% empty %}
+      <p style="color:var(--text-muted);font-size:0.875rem;text-align:center;padding:var(--space-lg) 0;">No messages from students yet.</p>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Right Column -->
+  <div>
+    <!-- Notifications -->
+    <div class="card" style="margin-bottom:var(--space-lg);">
+      <h5 style="margin-bottom:var(--space-md);">Recent Activity</h5>
+      <div class="timeline">
+        {% for notif in recent_notifications %}
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-date">{{ notif.created_at|timesince }} ago</div>
+          <div class="timeline-content">{{ notif.message }}</div>
+        </div>
+        {% empty %}
+        <div class="timeline-item"><div class="timeline-dot"></div><div class="timeline-date">2 hours ago</div><div class="timeline-content">New student viewed your profile</div></div>
+        <div class="timeline-item"><div class="timeline-dot"></div><div class="timeline-date">Yesterday</div><div class="timeline-content">3 applications on "Software Engineer" post</div></div>
+        <div class="timeline-item"><div class="timeline-dot"></div><div class="timeline-date">2 days ago</div><div class="timeline-content">Registered for Annual Alumni Meet</div></div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Upcoming Events -->
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-md);">
+        <h5>Upcoming Events</h5>
+        <a href="{% url 'alumni_events' %}" class="btn btn-ghost btn-sm" style="font-size:0.75rem;">All</a>
+      </div>
+      {% for event in upcoming_events %}
+      <div style="padding:var(--space-sm) 0;border-bottom:1px solid var(--border);">
+        <div style="font-weight:600;font-size:0.875rem;color:var(--navy);">{{ event.title|default:"Annual Alumni Meet" }}</div>
+        <div style="font-size:0.775rem;color:var(--text-muted);margin-top:2px;">{{ event.date|default:"Aug 18, 2024" }} · {{ event.location|default:"Main Campus" }}</div>
+      </div>
+      {% empty %}
+      <div style="padding:var(--space-sm) 0;border-bottom:1px solid var(--border);"><div style="font-weight:600;font-size:0.875rem;color:var(--navy);">Annual Alumni Meet</div><div style="font-size:0.775rem;color:var(--text-muted);margin-top:2px;">Aug 18 · Main Auditorium</div></div>
+      <div style="padding:var(--space-sm) 0;"><div style="font-weight:600;font-size:0.875rem;color:var(--navy);">Webinar: AI in Finance</div><div style="font-size:0.775rem;color:var(--text-muted);margin-top:2px;">Sep 5 · Online</div></div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}

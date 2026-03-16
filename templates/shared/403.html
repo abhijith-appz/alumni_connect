@@ -1,0 +1,25 @@
+{% extends "shared/base.html" %}
+{% block title %}Access Denied — {% endblock %}
+{% block navbar %}{% endblock %}
+{% block footer %}{% endblock %}
+{% block content %}
+<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--ivory);text-align:center;padding:var(--space-xl);">
+  <div style="max-width:500px;">
+    <div style="width:100px;height:100px;border-radius:50%;background:rgba(176,58,46,0.1);display:flex;align-items:center;justify-content:center;margin:0 auto var(--space-xl);font-size:2.5rem;">🔒</div>
+    <h2 style="margin-bottom:var(--space-md);">Access Denied</h2>
+    <p style="color:var(--text-muted);margin-bottom:var(--space-xl);">You don't have permission to view this page. This area requires a different account type or additional privileges.</p>
+    <div class="alert alert-warning" style="text-align:left;margin-bottom:var(--space-xl);">
+      <i class="fas fa-exclamation-triangle"></i>
+      <span>If you believe this is an error, please <a href="{% url 'contact' %}" style="color:#8b6914;font-weight:600;">contact the admin team</a>.</span>
+    </div>
+    <div style="display:flex;gap:var(--space-md);justify-content:center;flex-wrap:wrap;">
+      <a href="javascript:history.back()" class="btn btn-outline">← Go Back</a>
+      {% if user.is_authenticated %}
+      <a href="{% if user.is_student %}{% url 'student_dashboard' %}{% elif user.is_alumni %}{% url 'alumni_dashboard' %}{% else %}{% url 'admin_dashboard' %}{% endif %}" class="btn btn-gold"><i class="fas fa-th-large"></i> Dashboard</a>
+      {% else %}
+      <a href="{% url 'login' %}" class="btn btn-gold"><i class="fas fa-sign-in-alt"></i> Login</a>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

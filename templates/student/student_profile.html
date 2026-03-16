@@ -1,0 +1,93 @@
+{% extends "shared/dashboard_base.html" %}
+{% block page_title %}My Profile{% endblock %}
+{% block breadcrumb %}Home / <span>Profile</span>{% endblock %}
+{% block sidebar_nav %}{% include "student/partials/sidebar.html" %}{% endblock %}
+
+{% block dashboard_content %}
+<div style="display:grid;grid-template-columns:1fr 2fr;gap:var(--space-xl);">
+  <!-- Left: Profile Summary -->
+  <div>
+    <div class="card" style="text-align:center;margin-bottom:var(--space-lg);">
+      <div style="position:relative;width:fit-content;margin:0 auto var(--space-lg);">
+        <div class="avatar avatar-xl" style="background:var(--navy);font-size:2.5rem;margin:0 auto;">
+          {% if user.photo %}<img src="{{ user.photo.url }}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">
+          {% else %}{{ user.first_name.0 }}{{ user.last_name.0 }}{% endif %}
+        </div>
+        <label for="photoUpload" style="position:absolute;bottom:0;right:0;width:30px;height:30px;border-radius:50%;background:var(--gold);color:var(--navy);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:0.75rem;border:2px solid var(--white);">
+          <i class="fas fa-camera"></i>
+        </label>
+        <input type="file" id="photoUpload" style="display:none;" accept="image/*" onchange="uploadPhoto(this)">
+      </div>
+      <h3>{{ user.get_full_name }}</h3>
+      <p style="color:var(--text-muted);font-size:0.875rem;margin-bottom:var(--space-md);">{{ user.student_profile.department }} · Year {{ user.student_profile.current_year }}</p>
+      <div style="background:var(--ivory);border-radius:var(--radius-lg);padding:var(--space-md);margin-bottom:var(--space-md);">
+        <div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:6px;font-weight:500;">PROFILE COMPLETENESS</div>
+        <div style="background:var(--border);border-radius:var(--radius-full);height:8px;overflow:hidden;margin-bottom:6px;">
+          <div id="profileBar" style="width:{{ profile_completeness|default:65 }}%;height:100%;background:linear-gradient(90deg,var(--gold),var(--sage-light));border-radius:var(--radius-full);"></div>
+        </div>
+        <div style="font-size:0.8rem;font-weight:600;color:var(--navy);">{{ profile_completeness|default:65 }}%</div>
+      </div>
+    </div>
+
+    <!-- Quick Links -->
+    <div class="card">
+      <h5 style="margin-bottom:var(--space-md);">Account</h5>
+      <a href="{% url 'change_password' %}" class="sidebar-link" style="border-radius:var(--radius-md);padding:10px var(--space-md);"><span class="link-icon"><i class="fas fa-lock"></i></span> Change Password</a>
+      <a href="{% url 'user_settings' %}" class="sidebar-link" style="border-radius:var(--radius-md);padding:10px var(--space-md);"><span class="link-icon"><i class="fas fa-cog"></i></span> Settings</a>
+    </div>
+  </div>
+
+  <!-- Right: Edit Form -->
+  <div>
+    <div class="card card-gold-accent">
+      <h4 style="margin-bottom:var(--space-xl);">Edit Profile</h4>
+      <form method="POST" action="{% url 'student_profile' %}" enctype="multipart/form-data">
+        {% csrf_token %}
+        <!-- Personal Info -->
+        <h5 style="color:var(--text-muted);font-size:0.75rem;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:var(--space-md);">Personal Information</h5>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-md);">
+          <div class="form-group"><label class="form-label">First Name</label><input type="text" name="first_name" class="form-input" value="{{ user.first_name }}"></div>
+          <div class="form-group"><label class="form-label">Last Name</label><input type="text" name="last_name" class="form-input" value="{{ user.last_name }}"></div>
+        </div>
+        <div class="form-group"><label class="form-label">Email</label><input type="email" name="email" class="form-input" value="{{ user.email }}"></div>
+        <div class="form-group"><label class="form-label">Phone</label><input type="tel" name="phone" class="form-input" value="{{ user.student_profile.phone }}"></div>
+        <div class="form-group"><label class="form-label">Bio / About Me</label><textarea name="bio" class="form-textarea" rows="3" placeholder="Tell alumni a bit about yourself…">{{ user.student_profile.bio }}</textarea></div>
+
+        <hr class="divider">
+        <!-- Academic Info -->
+        <h5 style="color:var(--text-muted);font-size:0.75rem;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:var(--space-md);">Academic Details</h5>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-md);">
+          <div class="form-group"><label class="form-label">Student ID</label><input type="text" name="student_id" class="form-input" value="{{ user.student_profile.student_id }}" readonly style="background:var(--ivory);"></div>
+          <div class="form-group">
+            <label class="form-label">Department</label>
+            <select name="department" class="form-select">
+              {% for dept in departments %}<option value="{{ dept.id }}" {% if user.student_profile.department == dept.name %}selected{% endif %}>{{ dept.name }}</option>
+              {% empty %}<option>Computer Science</option><option>Management</option>{% endfor %}
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Current Year</label>
+            <select name="current_year" class="form-select">
+              {% for y in "1234" %}<option value="{{ y }}" {% if user.student_profile.current_year == y|add:0 %}selected{% endif %}>Year {{ y }}</option>{% endfor %}
+            </select>
+          </div>
+          <div class="form-group"><label class="form-label">Expected Graduation</label><input type="number" name="expected_graduation" class="form-input" value="{{ user.student_profile.expected_graduation }}" placeholder="2027"></div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Skills / Interests</label>
+          <input type="text" name="skills" class="form-input" value="{{ user.student_profile.skills }}" placeholder="Python, Design Thinking, Finance, etc.">
+          <p style="font-size:0.75rem;color:var(--text-muted);margin-top:4px;">Separate with commas</p>
+        </div>
+        <div class="form-group"><label class="form-label">LinkedIn URL</label><input type="url" name="linkedin_url" class="form-input" value="{{ user.student_profile.linkedin_url }}" placeholder="https://linkedin.com/in/yourname"></div>
+        <div class="form-group"><label class="form-label">GitHub URL</label><input type="url" name="github_url" class="form-input" value="{{ user.student_profile.github_url }}" placeholder="https://github.com/yourusername"></div>
+
+        <div style="display:flex;gap:var(--space-md);">
+          <button type="submit" class="btn btn-gold btn-lg"><i class="fas fa-save"></i> Save Changes</button>
+          <a href="{% url 'student_dashboard' %}" class="btn btn-ghost btn-lg">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

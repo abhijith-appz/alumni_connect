@@ -1,0 +1,109 @@
+{% extends "shared/base.html" %}
+{% block title %}Contact Us — {% endblock %}
+
+{% block content %}
+<section style="background:linear-gradient(135deg,var(--navy),var(--navy-mid));padding:var(--space-3xl) 0;">
+  <div class="container text-center">
+    <span class="section-eyebrow" style="color:var(--gold-light);">Get In Touch</span>
+    <h1 style="color:var(--ivory);margin-bottom:var(--space-md);">Contact Us</h1>
+    <p style="color:rgba(245,240,232,0.7);">We're here to help. Reach out for any questions about the alumni network.</p>
+  </div>
+</section>
+
+<section style="padding:var(--space-3xl) 0;background:var(--white);">
+  <div class="container">
+    <div style="display:grid;grid-template-columns:1fr 1.5fr;gap:var(--space-3xl);">
+
+      <!-- Contact Info -->
+      <div>
+        <h3 style="margin-bottom:var(--space-lg);">Reach Out Directly</h3>
+        <div style="display:flex;flex-direction:column;gap:var(--space-md);">
+          <div class="card" style="display:flex;align-items:center;gap:var(--space-md);padding:var(--space-md);">
+            <div style="width:44px;height:44px;border-radius:var(--radius-md);background:var(--gold-pale);color:var(--gold);display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;"><i class="fas fa-envelope"></i></div>
+            <div>
+              <div style="font-weight:600;font-size:0.875rem;color:var(--navy);">Email</div>
+              <a href="mailto:alumni@stxaviers.edu" style="color:var(--text-secondary);font-size:0.875rem;">alumni@stxaviers.edu</a>
+            </div>
+          </div>
+          <div class="card" style="display:flex;align-items:center;gap:var(--space-md);padding:var(--space-md);">
+            <div style="width:44px;height:44px;border-radius:var(--radius-md);background:rgba(74,124,111,0.12);color:var(--sage);display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;"><i class="fas fa-phone"></i></div>
+            <div>
+              <div style="font-weight:600;font-size:0.875rem;color:var(--navy);">Phone</div>
+              <a href="tel:+910000000000" style="color:var(--text-secondary);font-size:0.875rem;">+91 000 0000000</a>
+            </div>
+          </div>
+          <div class="card" style="display:flex;align-items:center;gap:var(--space-md);padding:var(--space-md);">
+            <div style="width:44px;height:44px;border-radius:var(--radius-md);background:rgba(15,31,61,0.08);color:var(--navy);display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;"><i class="fas fa-map-marker-alt"></i></div>
+            <div>
+              <div style="font-weight:600;font-size:0.875rem;color:var(--navy);">Address</div>
+              <p style="color:var(--text-secondary);font-size:0.875rem;margin:0;">St. Xavier's Campus, 5 Xavier Marg,<br>Mumbai 400001, Maharashtra</p>
+            </div>
+          </div>
+          <div class="card" style="display:flex;align-items:center;gap:var(--space-md);padding:var(--space-md);">
+            <div style="width:44px;height:44px;border-radius:var(--radius-md);background:var(--gold-pale);color:var(--gold);display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;"><i class="fas fa-clock"></i></div>
+            <div>
+              <div style="font-weight:600;font-size:0.875rem;color:var(--navy);">Office Hours</div>
+              <p style="color:var(--text-secondary);font-size:0.875rem;margin:0;">Mon–Fri: 9:00 AM – 5:00 PM IST</p>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top:var(--space-xl);">
+          <h5 style="margin-bottom:var(--space-md);">Follow Us</h5>
+          <div class="footer-social">
+            <a href="#" class="social-icon" style="background:rgba(15,31,61,0.08);color:var(--navy);border-color:var(--border);"><i class="fab fa-linkedin-in"></i></a>
+            <a href="#" class="social-icon" style="background:rgba(15,31,61,0.08);color:var(--navy);border-color:var(--border);"><i class="fab fa-twitter"></i></a>
+            <a href="#" class="social-icon" style="background:rgba(15,31,61,0.08);color:var(--navy);border-color:var(--border);"><i class="fab fa-instagram"></i></a>
+            <a href="#" class="social-icon" style="background:rgba(15,31,61,0.08);color:var(--navy);border-color:var(--border);"><i class="fab fa-facebook-f"></i></a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contact Form -->
+      <div>
+        <div class="card card-gold-accent">
+          <h3 style="margin-bottom:var(--space-xs);">Send Us a Message</h3>
+          <p style="margin-bottom:var(--space-lg);font-size:0.9rem;">We'll get back to you within 24 hours.</p>
+          <form method="POST" action="{% url 'contact' %}">
+            {% csrf_token %}
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-md);">
+              <div class="form-group">
+                <label class="form-label">First Name *</label>
+                <input type="text" name="first_name" class="form-input" placeholder="John" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Last Name *</label>
+                <input type="text" name="last_name" class="form-input" placeholder="Doe" required>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Email Address *</label>
+              <input type="email" name="email" class="form-input" placeholder="john@example.com" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">I am a…</label>
+              <select name="user_type" class="form-select">
+                <option value="student">Current Student</option>
+                <option value="alumni">Alumni</option>
+                <option value="faculty">Faculty/Staff</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Subject *</label>
+              <input type="text" name="subject" class="form-input" placeholder="How can we help?" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Message *</label>
+              <textarea name="message" class="form-textarea" placeholder="Write your message here…" required rows="5"></textarea>
+            </div>
+            <button type="submit" class="btn btn-gold btn-lg" style="width:100%;">
+              <i class="fas fa-paper-plane"></i> Send Message
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

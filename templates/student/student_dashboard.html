@@ -1,0 +1,223 @@
+{% extends "shared/dashboard_base.html" %}
+{% block page_title %}Student Dashboard{% endblock %}
+{% block breadcrumb %}Home / <span>Dashboard</span>{% endblock %}
+
+{% block sidebar_nav %}
+<p class="sidebar-section-label">Main</p>
+<a href="{% url 'student_dashboard' %}" class="sidebar-link active">
+  <span class="link-icon"><i class="fas fa-th-large"></i></span> Dashboard
+</a>
+<a href="{% url 'student_profile' %}" class="sidebar-link">
+  <span class="link-icon"><i class="fas fa-user"></i></span> My Profile
+</a>
+<p class="sidebar-section-label">Discover</p>
+<a href="{% url 'alumni_search' %}" class="sidebar-link">
+  <span class="link-icon"><i class="fas fa-search"></i></span> Search Alumni
+</a>
+<a href="{% url 'alumni_directory' %}" class="sidebar-link">
+  <span class="link-icon"><i class="fas fa-address-book"></i></span> Alumni Directory
+</a>
+<p class="sidebar-section-label">Opportunities</p>
+<a href="{% url 'student_jobs' %}" class="sidebar-link">
+  <span class="link-icon"><i class="fas fa-briefcase"></i></span> Job Board
+  {% if new_jobs_count %}<span class="badge-count">{{ new_jobs_count }}</span>{% endif %}
+</a>
+<a href="{% url 'student_internships' %}" class="sidebar-link">
+  <span class="link-icon"><i class="fas fa-graduation-cap"></i></span> Internships
+</a>
+<a href="{% url 'career_guidance' %}" class="sidebar-link">
+  <span class="link-icon"><i class="fas fa-compass"></i></span> Career Guidance
+</a>
+<p class="sidebar-section-label">Events</p>
+<a href="{% url 'student_events' %}" class="sidebar-link">
+  <span class="link-icon"><i class="fas fa-calendar-alt"></i></span> Events
+</a>
+<p class="sidebar-section-label">Communication</p>
+<a href="{% url 'student_messages' %}" class="sidebar-link">
+  <span class="link-icon"><i class="fas fa-comments"></i></span> Messages
+  {% if unread_messages %}<span class="badge-count">{{ unread_messages }}</span>{% endif %}
+</a>
+<a href="{% url 'notifications' %}" class="sidebar-link">
+  <span class="link-icon"><i class="fas fa-bell"></i></span> Notifications
+</a>
+<p class="sidebar-section-label">AI Tools</p>
+<a href="{% url 'ai_chat' %}" class="sidebar-link">
+  <span class="link-icon"><i class="fas fa-robot"></i></span> AI Assistant
+</a>
+<a href="{% url 'ai_career_guidance' %}" class="sidebar-link">
+  <span class="link-icon"><i class="fas fa-chart-line"></i></span> AI Career Guide
+</a>
+<a href="{% url 'ai_alumni_finder' %}" class="sidebar-link">
+  <span class="link-icon"><i class="fas fa-user-friends"></i></span> AI Alumni Finder
+</a>
+<a href="{% url 'ai_job_recommendations' %}" class="sidebar-link">
+  <span class="link-icon"><i class="fas fa-magic"></i></span> Job Recommender
+</a>
+{% endblock %}
+
+{% block dashboard_content %}
+
+<!-- Welcome Banner -->
+<div style="background:linear-gradient(135deg,var(--navy) 0%,var(--navy-light) 100%);border-radius:var(--radius-xl);padding:var(--space-xl);margin-bottom:var(--space-xl);position:relative;overflow:hidden;">
+  <div style="position:absolute;right:0;top:0;bottom:0;width:300px;background:radial-gradient(circle at right,rgba(200,169,110,0.12),transparent 70%);pointer-events:none;"></div>
+  <div style="position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:var(--space-md);">
+    <div>
+      <p style="color:var(--gold);font-size:0.8125rem;font-weight:500;letter-spacing:0.06em;margin-bottom:6px;">{{ greeting }}, Welcome Back</p>
+      <h2 style="color:var(--ivory);margin-bottom:8px;">{{ user.get_full_name }}</h2>
+      <p style="color:rgba(245,240,232,0.65);font-size:0.9rem;">{{ user.student_profile.department }} · Year {{ user.student_profile.current_year }}</p>
+    </div>
+    <div style="display:flex;gap:var(--space-md);">
+      <a href="{% url 'ai_chat' %}" class="btn btn-gold"><i class="fas fa-robot"></i> Ask AI</a>
+      <a href="{% url 'alumni_search' %}" class="btn btn-outline" style="color:var(--ivory);border-color:rgba(245,240,232,0.35);">Find Alumni</a>
+    </div>
+  </div>
+</div>
+
+<!-- Stats Row -->
+<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:var(--space-md);margin-bottom:var(--space-xl);">
+  <div class="stat-card">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-sm);">
+      <div class="stat-icon"><i class="fas fa-briefcase"></i></div>
+      <span style="font-size:0.75rem;color:var(--sage);font-weight:500;">+{{ new_jobs_count|default:5 }} new</span>
+    </div>
+    <div class="stat-value">{{ total_jobs|default:142 }}</div>
+    <div class="stat-label">Active Jobs</div>
+  </div>
+  <div class="stat-card">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-sm);">
+      <div class="stat-icon" style="background:rgba(74,124,111,0.12);color:var(--sage);"><i class="fas fa-user-friends"></i></div>
+      <span style="font-size:0.75rem;color:var(--sage);font-weight:500;">Network</span>
+    </div>
+    <div class="stat-value">{{ connected_alumni|default:8 }}</div>
+    <div class="stat-label">Alumni Connected</div>
+  </div>
+  <div class="stat-card">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-sm);">
+      <div class="stat-icon" style="background:rgba(15,31,61,0.08);color:var(--navy);"><i class="fas fa-calendar-check"></i></div>
+      <span style="font-size:0.75rem;color:var(--gold);font-weight:500;">Upcoming</span>
+    </div>
+    <div class="stat-value">{{ upcoming_events|default:3 }}</div>
+    <div class="stat-label">Events</div>
+  </div>
+  <div class="stat-card">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-sm);">
+      <div class="stat-icon" style="background:rgba(176,58,46,0.08);color:var(--crimson);"><i class="fas fa-comments"></i></div>
+      {% if unread_messages %}<span style="font-size:0.75rem;color:var(--crimson);font-weight:500;">{{ unread_messages }} unread</span>{% endif %}
+    </div>
+    <div class="stat-value">{{ total_messages|default:12 }}</div>
+    <div class="stat-label">Messages</div>
+  </div>
+</div>
+
+<!-- Main Grid -->
+<div style="display:grid;grid-template-columns:2fr 1fr;gap:var(--space-xl);">
+  <div>
+    <!-- Latest Jobs -->
+    <div class="card" style="margin-bottom:var(--space-lg);">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-lg);">
+        <h4><i class="fas fa-briefcase" style="color:var(--gold);margin-right:8px;font-size:0.9rem;"></i>Latest Job Postings</h4>
+        <a href="{% url 'student_jobs' %}" class="btn btn-ghost btn-sm">View All <i class="fas fa-arrow-right"></i></a>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:var(--space-md);">
+        {% for job in latest_jobs %}
+        <a href="{% url 'job_detail' job.pk %}" style="display:flex;align-items:center;gap:var(--space-md);padding:var(--space-md);border:1px solid var(--border);border-radius:var(--radius-md);transition:all var(--transition);" onmouseover="this.style.borderColor='var(--border-gold)'" onmouseout="this.style.borderColor='var(--border)'">
+          <div style="width:42px;height:42px;border-radius:var(--radius-md);background:var(--navy);color:var(--gold);font-family:var(--font-display);font-weight:700;font-size:1.1rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;">{{ job.company.0 }}</div>
+          <div style="flex:1;min-width:0;">
+            <div style="font-weight:600;color:var(--navy);font-size:0.9375rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ job.title }}</div>
+            <div style="font-size:0.8125rem;color:var(--text-muted);">{{ job.company }} · {{ job.location }}</div>
+          </div>
+          <span class="badge {% if job.type == 'Full Time' %}badge-navy{% else %}badge-gold{% endif %}">{{ job.type }}</span>
+        </a>
+        {% empty %}
+        {% for j in "12345" %}
+        <div style="display:flex;align-items:center;gap:var(--space-md);padding:var(--space-md);border:1px solid var(--border);border-radius:var(--radius-md);">
+          <div style="width:42px;height:42px;border-radius:var(--radius-md);background:var(--navy);color:var(--gold);font-family:var(--font-display);font-weight:700;font-size:1.1rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;">{% if forloop.counter == 1 %}G{% elif forloop.counter == 2 %}M{% elif forloop.counter == 3 %}A{% elif forloop.counter == 4 %}T{% else %}F{% endif %}</div>
+          <div style="flex:1;">
+            <div style="font-weight:600;color:var(--navy);font-size:0.9375rem;">{% if forloop.counter == 1 %}Software Engineer{% elif forloop.counter == 2 %}Product Manager{% elif forloop.counter == 3 %}Data Scientist{% elif forloop.counter == 4 %}UX Designer{% else %}ML Engineer{% endif %}</div>
+            <div style="font-size:0.8125rem;color:var(--text-muted);">{% if forloop.counter == 1 %}Google{% elif forloop.counter == 2 %}Microsoft{% elif forloop.counter == 3 %}Amazon{% elif forloop.counter == 4 %}Tesla{% else %}Facebook{% endif %} · Bangalore</div>
+          </div>
+          <span class="badge {% if forloop.counter <= 3 %}badge-navy{% else %}badge-gold{% endif %}">{% if forloop.counter <= 3 %}Full Time{% else %}Internship{% endif %}</span>
+        </div>
+        {% endfor %}
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Upcoming Events -->
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-lg);">
+        <h4><i class="fas fa-calendar-alt" style="color:var(--gold);margin-right:8px;font-size:0.9rem;"></i>Upcoming Events</h4>
+        <a href="{% url 'student_events' %}" class="btn btn-ghost btn-sm">View All <i class="fas fa-arrow-right"></i></a>
+      </div>
+      {% for event in upcoming_events_list %}
+      <div style="display:flex;gap:var(--space-md);padding:var(--space-md) 0;border-bottom:1px solid var(--border);">
+        <div style="width:52px;text-align:center;flex-shrink:0;">
+          <div style="font-family:var(--font-display);font-size:1.5rem;font-weight:600;color:var(--navy);line-height:1;">{{ event.date|date:"d" }}</div>
+          <div style="font-size:0.7rem;text-transform:uppercase;font-weight:600;color:var(--gold);letter-spacing:0.06em;">{{ event.date|date:"M" }}</div>
+        </div>
+        <div style="flex:1;">
+          <div style="font-weight:600;color:var(--navy);font-size:0.9rem;">{{ event.title }}</div>
+          <div style="font-size:0.8rem;color:var(--text-muted);margin-top:2px;"><i class="fas fa-map-marker-alt" style="font-size:0.7rem;"></i> {{ event.location }}</div>
+        </div>
+        <a href="{% url 'event_detail' event.pk %}" class="btn btn-outline btn-sm" style="align-self:center;">RSVP</a>
+      </div>
+      {% empty %}
+      {% for e in "123" %}
+      <div style="display:flex;gap:var(--space-md);padding:var(--space-md) 0;border-bottom:1px solid var(--border);">
+        <div style="width:52px;text-align:center;flex-shrink:0;">
+          <div style="font-family:var(--font-display);font-size:1.5rem;font-weight:600;color:var(--navy);line-height:1;">{% if forloop.counter == 1 %}18{% elif forloop.counter == 2 %}24{% else %}30{% endif %}</div>
+          <div style="font-size:0.7rem;text-transform:uppercase;font-weight:600;color:var(--gold);letter-spacing:0.06em;">{% if forloop.counter == 1 %}Aug{% elif forloop.counter == 2 %}Aug{% else %}Sep{% endif %}</div>
+        </div>
+        <div style="flex:1;">
+          <div style="font-weight:600;color:var(--navy);font-size:0.9rem;">{% if forloop.counter == 1 %}Annual Alumni Meet 2024{% elif forloop.counter == 2 %}Career Fair Webinar{% else %}Tech Talk: AI in Industry{% endif %}</div>
+          <div style="font-size:0.8rem;color:var(--text-muted);margin-top:2px;"><i class="fas fa-map-marker-alt" style="font-size:0.7rem;"></i> {% if forloop.counter == 1 %}Main Campus Auditorium{% elif forloop.counter == 2 %}Online — Zoom{% else %}CS Seminar Hall{% endif %}</div>
+        </div>
+        <a href="#" class="btn btn-outline btn-sm" style="align-self:center;">RSVP</a>
+      </div>
+      {% endfor %}
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Right Column -->
+  <div>
+    <!-- AI Assistant Card -->
+    <div style="background:linear-gradient(135deg,var(--navy),var(--navy-light));border-radius:var(--radius-xl);padding:var(--space-xl);margin-bottom:var(--space-lg);text-align:center;border:1px solid rgba(200,169,110,0.2);">
+      <div style="font-size:2rem;margin-bottom:var(--space-md);">🤖</div>
+      <h4 style="color:var(--ivory);margin-bottom:8px;">AI Career Assistant</h4>
+      <p style="color:rgba(245,240,232,0.65);font-size:0.875rem;margin-bottom:var(--space-md);">Get personalized career advice, find alumni mentors, and explore job matches.</p>
+      <a href="{% url 'ai_chat' %}" class="btn btn-gold" style="width:100%;justify-content:center;">Start Chat</a>
+    </div>
+
+    <!-- Profile Completeness -->
+    <div class="card" style="margin-bottom:var(--space-lg);">
+      <h5 style="margin-bottom:var(--space-md);">Profile Completeness</h5>
+      <div style="background:var(--border);border-radius:var(--radius-full);height:8px;overflow:hidden;margin-bottom:var(--space-sm);">
+        <div style="width:{{ profile_completeness|default:65 }}%;height:100%;background:linear-gradient(90deg,var(--gold),var(--sage-light));border-radius:var(--radius-full);transition:width 1s;"></div>
+      </div>
+      <p style="font-size:0.8rem;color:var(--text-muted);">{{ profile_completeness|default:65 }}% complete</p>
+      <a href="{% url 'student_profile' %}" class="btn btn-outline btn-sm" style="margin-top:var(--space-sm);width:100%;justify-content:center;">Complete Profile</a>
+    </div>
+
+    <!-- Recent Messages -->
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-md);">
+        <h5>Recent Messages</h5>
+        <a href="{% url 'student_messages' %}" class="btn btn-ghost btn-sm" style="font-size:0.75rem;">See All</a>
+      </div>
+      {% for msg in recent_messages %}
+      <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);">
+        <div class="avatar avatar-sm" style="background:var(--navy);">{{ msg.sender.first_name.0 }}</div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:0.875rem;font-weight:500;color:var(--navy);">{{ msg.sender.get_full_name }}</div>
+          <div style="font-size:0.775rem;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ msg.preview }}</div>
+        </div>
+      </div>
+      {% empty %}
+      <p style="color:var(--text-muted);font-size:0.875rem;text-align:center;padding:var(--space-md) 0;">No messages yet. <a href="{% url 'alumni_directory' %}" style="color:var(--gold);">Connect with alumni!</a></p>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+{% endblock %}

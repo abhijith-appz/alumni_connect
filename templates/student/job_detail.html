@@ -1,0 +1,130 @@
+{% extends "shared/dashboard_base.html" %}
+{% block page_title %}Job Details{% endblock %}
+{% block breadcrumb %}Jobs / <span>{{ job.title|default:"Job Details" }}</span>{% endblock %}
+{% block sidebar_nav %}{% include "student/partials/sidebar.html" %}{% endblock %}
+
+{% block dashboard_content %}
+<div style="display:grid;grid-template-columns:2fr 1fr;gap:var(--space-xl);">
+  <!-- Main Content -->
+  <div>
+    <div class="card card-gold-accent">
+      <!-- Header -->
+      <div style="display:flex;align-items:flex-start;gap:var(--space-lg);margin-bottom:var(--space-xl);">
+        <div style="width:72px;height:72px;border-radius:var(--radius-lg);background:var(--navy);color:var(--gold);font-family:var(--font-display);font-weight:700;font-size:1.75rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;">{{ job.company.0|default:"G" }}</div>
+        <div style="flex:1;">
+          <h2 style="margin-bottom:6px;">{{ job.title|default:"Software Engineer" }}</h2>
+          <p style="color:var(--text-secondary);font-size:1rem;margin-bottom:var(--space-md);">{{ job.company|default:"Google" }} · {{ job.location|default:"Bangalore, India" }}</p>
+          <div style="display:flex;gap:var(--space-sm);flex-wrap:wrap;">
+            <span class="badge badge-navy">{{ job.type|default:"Full Time" }}</span>
+            <span class="badge badge-gold">{{ job.department|default:"Technology" }}</span>
+            {% if job.is_remote %}<span class="badge badge-sage">Remote OK</span>{% endif %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Key Details -->
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-md);padding:var(--space-lg);background:var(--ivory);border-radius:var(--radius-lg);margin-bottom:var(--space-xl);">
+        <div style="text-align:center;">
+          <div style="font-size:0.75rem;color:var(--text-muted);font-weight:500;margin-bottom:4px;">SALARY</div>
+          <div style="font-weight:600;color:var(--navy);">{{ job.salary|default:"₹12–18 LPA" }}</div>
+        </div>
+        <div style="text-align:center;border-left:1px solid var(--border);border-right:1px solid var(--border);">
+          <div style="font-size:0.75rem;color:var(--text-muted);font-weight:500;margin-bottom:4px;">EXPERIENCE</div>
+          <div style="font-weight:600;color:var(--navy);">{{ job.experience|default:"2–4 years" }}</div>
+        </div>
+        <div style="text-align:center;">
+          <div style="font-size:0.75rem;color:var(--text-muted);font-weight:500;margin-bottom:4px;">DEADLINE</div>
+          <div style="font-weight:600;color:var(--navy);">{{ job.deadline|default:"Aug 30, 2024" }}</div>
+        </div>
+      </div>
+
+      <!-- Description -->
+      <h4 style="margin-bottom:var(--space-md);">Job Description</h4>
+      <div style="color:var(--text-secondary);line-height:1.8;margin-bottom:var(--space-xl);">
+        {{ job.description|default:"We are looking for a talented Software Engineer to join our team. You will design, develop, and maintain high-quality software solutions in a collaborative environment." }}
+      </div>
+
+      <h4 style="margin-bottom:var(--space-md);">Requirements</h4>
+      <ul style="color:var(--text-secondary);line-height:2;padding-left:var(--space-lg);margin-bottom:var(--space-xl);">
+        {% for req in job.requirements_list %}<li>{{ req }}</li>{% empty %}
+        <li>B.Tech/B.E. in Computer Science or related field</li>
+        <li>2+ years of experience in software development</li>
+        <li>Proficiency in Python, Java, or Go</li>
+        <li>Experience with cloud platforms (AWS/GCP/Azure)</li>
+        <li>Strong problem-solving and communication skills</li>
+        {% endfor %}
+      </ul>
+
+      <h4 style="margin-bottom:var(--space-md);">Skills Required</h4>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:var(--space-xl);">
+        {% for skill in job.skills_list %}<span class="badge badge-navy">{{ skill }}</span>{% empty %}
+        <span class="badge badge-navy">Python</span><span class="badge badge-navy">Django</span>
+        <span class="badge badge-navy">PostgreSQL</span><span class="badge badge-navy">AWS</span>
+        <span class="badge badge-navy">Docker</span><span class="badge badge-navy">Git</span>
+        {% endfor %}
+      </div>
+
+      <!-- Apply Button -->
+      <form method="POST" action="{% url 'apply_job' job.pk|default:1 %}">
+        {% csrf_token %}
+        <div class="form-group">
+          <label class="form-label">Cover Letter (optional)</label>
+          <textarea name="cover_letter" class="form-textarea" placeholder="Tell the alumni why you're a great fit…" rows="4"></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Resume</label>
+          <input type="file" name="resume" class="form-input" accept=".pdf,.doc,.docx">
+        </div>
+        <div style="display:flex;gap:var(--space-md);">
+          <button type="submit" class="btn btn-gold btn-lg" style="flex:1;justify-content:center;"><i class="fas fa-paper-plane"></i> Apply Now</button>
+          <button type="button" class="btn btn-outline" onclick="saveJob()"><i class="fas fa-bookmark"></i> Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Sidebar -->
+  <div>
+    <!-- Posted By -->
+    <div class="card" style="margin-bottom:var(--space-lg);">
+      <h5 style="margin-bottom:var(--space-md);">Posted By</h5>
+      <div style="display:flex;align-items:center;gap:var(--space-md);margin-bottom:var(--space-md);">
+        <div class="avatar avatar-lg" style="background:var(--navy);">{{ job.posted_by.first_name.0|default:"A" }}</div>
+        <div>
+          <div style="font-weight:600;color:var(--navy);">{{ job.posted_by.get_full_name|default:"Alumni Name" }}</div>
+          <div style="font-size:0.8125rem;color:var(--text-muted);">{{ job.posted_by.alumni_profile.current_position|default:"Senior Engineer" }}</div>
+          <div style="font-size:0.75rem;color:var(--gold);">Class of {{ job.posted_by.alumni_profile.graduation_year|default:"2018" }}</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:var(--space-sm);">
+        <a href="{% url 'alumni_profile_public' job.posted_by.pk|default:1 %}" class="btn btn-outline btn-sm" style="flex:1;justify-content:center;">View Profile</a>
+        <a href="{% url 'student_messages' %}?user={{ job.posted_by.pk|default:1 }}" class="btn btn-ghost btn-sm"><i class="fas fa-comment"></i></a>
+      </div>
+    </div>
+
+    <!-- Similar Jobs -->
+    <div class="card">
+      <h5 style="margin-bottom:var(--space-md);">Similar Jobs</h5>
+      {% for sj in similar_jobs %}
+      <a href="{% url 'job_detail' sj.pk %}" style="display:block;padding:10px 0;border-bottom:1px solid var(--border);">
+        <div style="font-weight:600;font-size:0.875rem;color:var(--navy);">{{ sj.title }}</div>
+        <div style="font-size:0.775rem;color:var(--text-muted);">{{ sj.company }} · {{ sj.type }}</div>
+      </a>
+      {% empty %}
+      <a href="#" style="display:block;padding:10px 0;border-bottom:1px solid var(--border);">
+        <div style="font-weight:600;font-size:0.875rem;color:var(--navy);">Backend Developer</div>
+        <div style="font-size:0.775rem;color:var(--text-muted);">Flipkart · Full Time</div>
+      </a>
+      <a href="#" style="display:block;padding:10px 0;border-bottom:1px solid var(--border);">
+        <div style="font-weight:600;font-size:0.875rem;color:var(--navy);">Python Engineer</div>
+        <div style="font-size:0.775rem;color:var(--text-muted);">Razorpay · Full Time</div>
+      </a>
+      <a href="#" style="display:block;padding:10px 0;">
+        <div style="font-weight:600;font-size:0.875rem;color:var(--navy);">Full Stack Developer</div>
+        <div style="font-size:0.775rem;color:var(--text-muted);">Zomato · Full Time</div>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}

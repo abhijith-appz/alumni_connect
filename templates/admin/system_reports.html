@@ -1,0 +1,70 @@
+{% extends "shared/dashboard_base.html" %}
+{% block page_title %}System Reports{% endblock %}
+{% block breadcrumb %}Admin / <span>Reports</span>{% endblock %}
+{% block sidebar_nav %}{% include "admin/partials/sidebar.html" %}{% endblock %}
+
+{% block dashboard_content %}
+<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-xl);flex-wrap:wrap;gap:var(--space-md);">
+  <div><h3>Analytics & Reports</h3><p style="color:var(--text-muted);">Platform performance and usage statistics</p></div>
+  <div style="display:flex;gap:var(--space-sm);">
+    <select class="form-select" style="width:160px;"><option>Last 30 Days</option><option>Last 90 Days</option><option>This Year</option><option>All Time</option></select>
+    <button class="btn btn-outline"><i class="fas fa-download"></i> Export PDF</button>
+  </div>
+</div>
+<!-- Stats Cards -->
+<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:var(--space-md);margin-bottom:var(--space-xl);">
+  <div class="stat-card"><div class="stat-icon" style="margin-bottom:var(--space-sm);"><i class="fas fa-user-plus"></i></div><div class="stat-value">{{ new_registrations|default:284 }}</div><div class="stat-label">New Registrations</div><p style="font-size:0.75rem;color:var(--sage);margin-top:4px;">↑ 12% from last month</p></div>
+  <div class="stat-card"><div class="stat-icon" style="background:rgba(74,124,111,0.12);color:var(--sage);margin-bottom:var(--space-sm);"><i class="fas fa-briefcase"></i></div><div class="stat-value">{{ job_applications|default:1240 }}</div><div class="stat-label">Job Applications</div><p style="font-size:0.75rem;color:var(--sage);margin-top:4px;">↑ 8% from last month</p></div>
+  <div class="stat-card"><div class="stat-icon" style="background:rgba(15,31,61,0.08);color:var(--navy);margin-bottom:var(--space-sm);"><i class="fas fa-comments"></i></div><div class="stat-value">{{ total_messages|default:3821 }}</div><div class="stat-label">Messages Sent</div><p style="font-size:0.75rem;color:var(--sage);margin-top:4px;">↑ 22% from last month</p></div>
+  <div class="stat-card"><div class="stat-icon" style="background:var(--gold-pale);color:var(--gold);margin-bottom:var(--space-sm);"><i class="fas fa-robot"></i></div><div class="stat-value">{{ ai_chats|default:4156 }}</div><div class="stat-label">AI Interactions</div><p style="font-size:0.75rem;color:var(--sage);margin-top:4px;">↑ 35% from last month</p></div>
+</div>
+
+<!-- Charts Row -->
+<div style="display:grid;grid-template-columns:2fr 1fr;gap:var(--space-xl);margin-bottom:var(--space-xl);">
+  <div class="card">
+    <h4 style="margin-bottom:var(--space-lg);">User Registrations Over Time</h4>
+    <canvas id="registrationsChart" height="200"></canvas>
+  </div>
+  <div class="card">
+    <h4 style="margin-bottom:var(--space-lg);">Users by Department</h4>
+    <canvas id="departmentChart" height="200"></canvas>
+  </div>
+</div>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-xl);">
+  <div class="card">
+    <h4 style="margin-bottom:var(--space-lg);">Job Posts by Type</h4>
+    <canvas id="jobTypesChart" height="180"></canvas>
+  </div>
+  <div class="card">
+    <h4 style="margin-bottom:var(--space-lg);">Top Job-Posting Alumni Companies</h4>
+    {% for company in top_companies %}
+    <div style="display:flex;align-items:center;gap:var(--space-md);margin-bottom:var(--space-md);">
+      <div style="width:32px;height:32px;border-radius:var(--radius-md);background:var(--navy);color:var(--gold);font-family:var(--font-display);font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:0.9rem;">{{ company.name.0 }}</div>
+      <div style="flex:1;"><div style="font-weight:500;font-size:0.875rem;color:var(--navy);">{{ company.name }}</div><div style="background:var(--border);border-radius:var(--radius-full);height:6px;overflow:hidden;margin-top:4px;"><div style="width:{{ company.percentage }}%;height:100%;background:linear-gradient(90deg,var(--gold),var(--sage-light));"></div></div></div>
+      <span style="font-size:0.8125rem;color:var(--text-muted);font-weight:500;min-width:30px;text-align:right;">{{ company.count }}</span>
+    </div>
+    {% empty %}
+    {% for c in "12345" %}
+    <div style="display:flex;align-items:center;gap:var(--space-md);margin-bottom:var(--space-md);">
+      <div style="width:32px;height:32px;border-radius:var(--radius-md);background:var(--navy);color:var(--gold);font-family:var(--font-display);font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:0.9rem;">{% cycle "G" "M" "A" "T" "I" %}</div>
+      <div style="flex:1;"><div style="font-weight:500;font-size:0.875rem;color:var(--navy);">{% cycle "Google" "Microsoft" "Amazon" "TCS" "Infosys" %}</div><div style="background:var(--border);border-radius:var(--radius-full);height:6px;overflow:hidden;margin-top:4px;"><div style="width:{% cycle "90" "75" "65" "55" "45" %}%;height:100%;background:linear-gradient(90deg,var(--gold),var(--sage-light));"></div></div></div>
+      <span style="font-size:0.8125rem;color:var(--text-muted);font-weight:500;min-width:30px;text-align:right;">{% cycle "42" "35" "28" "22" "18" %}</span>
+    </div>
+    {% endfor %}
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script>
+const colors = { gold:'#c8a96e', sage:'#4a7c6f', navy:'#0f1f3d', border:'rgba(15,31,61,0.12)' };
+// Registrations line chart
+new Chart(document.getElementById('registrationsChart'),{type:'line',data:{labels:['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug'],datasets:[{label:'Students',data:[42,58,45,70,85,90,78,95],borderColor:colors.navy,backgroundColor:'rgba(15,31,61,0.06)',tension:0.4,fill:true},{label:'Alumni',data:[18,25,30,22,40,35,42,50],borderColor:colors.gold,backgroundColor:'rgba(200,169,110,0.08)',tension:0.4,fill:true}]},options:{responsive:true,plugins:{legend:{position:'bottom'}},scales:{y:{beginAtZero:true,grid:{color:colors.border}},x:{grid:{display:false}}}}});
+// Department doughnut
+new Chart(document.getElementById('departmentChart'),{type:'doughnut',data:{labels:['CS','MBA','Engineering','Law','Arts','Other'],datasets:[{data:[35,25,20,10,6,4],backgroundColor:[colors.navy,'#1a3460',colors.gold,'#e0c890',colors.sage,'#8e9bb5'],borderWidth:2,borderColor:'white'}]},options:{responsive:true,plugins:{legend:{position:'bottom'}}}});
+// Job types bar
+new Chart(document.getElementById('jobTypesChart'),{type:'bar',data:{labels:['Full Time','Internship','Part Time','Remote','Contract'],datasets:[{data:[145,82,34,56,20],backgroundColor:[colors.navy,colors.gold,colors.sage,'rgba(15,31,61,0.5)','rgba(200,169,110,0.5)'],borderRadius:6}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,grid:{color:colors.border}},x:{grid:{display:false}}}}});
+</script>
+{% endblock %}

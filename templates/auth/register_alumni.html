@@ -1,0 +1,88 @@
+{% extends "shared/base.html" %}
+{% block title %}Alumni Registration — {% endblock %}
+{% block navbar %}{% endblock %}
+{% block footer %}{% endblock %}
+{% block content %}
+<div class="auth-page">
+  <div class="auth-left" style="background:linear-gradient(160deg,#1a2f5e 0%,#0f1f3d 100%);">
+    <div class="auth-left-inner">
+      <a href="{% url 'home' %}" class="auth-brand">
+        <div class="navbar-logo">A</div>
+        <div><div class="navbar-brand-name">AlumniConnect</div><div class="navbar-brand-sub">Vast</div></div>
+      </a>
+      <div class="auth-hero-text">
+        <h2>Join as<br><em style="color:var(--gold);font-style:italic;">Alumni</em></h2>
+        <p>Reconnect with your alma mater, mentor students, and share opportunities with the next generation.</p>
+      </div>
+      <div style="background:rgba(200,169,110,0.1);border:1px solid rgba(200,169,110,0.2);border-radius:var(--radius-lg);padding:var(--space-lg);">
+        <h5 style="color:var(--ivory);margin-bottom:var(--space-md);">As an Alumni you can</h5>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div style="display:flex;align-items:center;gap:10px;color:rgba(245,240,232,0.8);font-size:0.875rem;"><span style="color:var(--gold);">★</span> Post job & internship opportunities</div>
+          <div style="display:flex;align-items:center;gap:10px;color:rgba(245,240,232,0.8);font-size:0.875rem;"><span style="color:var(--gold);">★</span> Mentor current students</div>
+          <div style="display:flex;align-items:center;gap:10px;color:rgba(245,240,232,0.8);font-size:0.875rem;"><span style="color:var(--gold);">★</span> Connect with fellow alumni</div>
+          <div style="display:flex;align-items:center;gap:10px;color:rgba(245,240,232,0.8);font-size:0.875rem;"><span style="color:var(--gold);">★</span> Participate in events</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="auth-right" style="overflow-y:auto;max-height:100vh;">
+    <div style="width:100%;max-width:500px;padding:var(--space-lg) 0;">
+      <div style="margin-bottom:var(--space-xl);">
+        <h3 style="font-family:var(--font-display);font-size:1.75rem;color:var(--navy);">Alumni Registration</h3>
+        <p style="color:var(--text-muted);font-size:0.9rem;">Your registration will be verified by admin before activation</p>
+      </div>
+      <form method="POST" action="{% url 'register_alumni' %}" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-md);">
+          <div class="form-group"><label class="form-label">First Name *</label><input type="text" name="first_name" class="form-input" required></div>
+          <div class="form-group"><label class="form-label">Last Name *</label><input type="text" name="last_name" class="form-input" required></div>
+        </div>
+        <div class="form-group"><label class="form-label">Email *</label><input type="email" name="email" class="form-input" required></div>
+        <div class="form-group"><label class="form-label">Phone</label><input type="tel" name="phone" class="form-input"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-md);">
+          <div class="form-group">
+            <label class="form-label">Department *</label>
+            <select name="department" class="form-select" required>
+              <option value="">Select Department</option>
+              {% for dept in departments %}<option value="{{ dept.id }}">{{ dept.name }}</option>{% empty %}
+              <option value="cs">Computer Science</option><option value="mba">Management</option><option value="eng">Engineering</option>{% endfor %}
+            </select>
+          </div>
+          <div class="form-group"><label class="form-label">Graduation Year *</label><input type="number" name="graduation_year" class="form-input" placeholder="2018" min="1962" max="2024" required></div>
+        </div>
+        <div class="form-group"><label class="form-label">Current Company</label><input type="text" name="company" class="form-input" placeholder="Google, Self-employed, etc."></div>
+        <div class="form-group"><label class="form-label">Current Position / Role</label><input type="text" name="current_position" class="form-input" placeholder="Software Engineer, CEO, etc."></div>
+        <div class="form-group"><label class="form-label">LinkedIn Profile URL</label><input type="url" name="linkedin_url" class="form-input" placeholder="https://linkedin.com/in/yourname"></div>
+        <div class="form-group"><label class="form-label">Bio / About</label><textarea name="bio" class="form-textarea" placeholder="Brief introduction about yourself…" rows="3"></textarea></div>
+        <div class="form-group"><label class="form-label">Profile Photo</label><input type="file" name="photo" class="form-input" accept="image/*"></div>
+        <hr class="divider">
+        <div class="form-group"><label class="form-label">Username *</label><input type="text" name="username" class="form-input" required></div>
+        <div class="form-group"><label class="form-label">Password *</label><input type="password" name="password1" class="form-input" required></div>
+        <div class="form-group"><label class="form-label">Confirm Password *</label><input type="password" name="password2" class="form-input" required></div>
+        <div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:var(--space-lg);">
+          <input type="checkbox" name="agree_terms" id="terms" required style="width:16px;height:16px;accent-color:var(--gold);margin-top:2px;">
+          <label for="terms" style="font-size:0.875rem;color:var(--text-secondary);">I agree to the <a href="#" style="color:var(--gold);">Terms of Service</a> and confirm that I am a St. Xavier's alumnus.</label>
+        </div>
+        <button type="submit" class="btn btn-gold btn-lg" style="width:100%;"><i class="fas fa-user-graduate"></i> Submit Registration</button>
+      </form>
+      <p style="text-align:center;margin-top:var(--space-lg);font-size:0.875rem;color:var(--text-muted);">
+        Are you a student? <a href="{% url 'register_student' %}" style="color:var(--gold);font-weight:600;">Register as Student</a> &nbsp;·&nbsp;
+        <a href="{% url 'login' %}" style="color:var(--gold);font-weight:600;">Sign In</a>
+      </p>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block extra_css %}
+<style>
+.auth-page{display:grid;grid-template-columns:1fr 1fr;min-height:100vh;}
+.auth-left{background:linear-gradient(160deg,var(--navy) 0%,var(--navy-mid) 60%,#1a3a5c 100%);padding:var(--space-2xl);display:flex;align-items:stretch;position:relative;overflow:hidden;}
+.auth-left::before{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(200,169,110,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(200,169,110,0.04) 1px,transparent 1px);background-size:40px 40px;}
+.auth-left-inner{display:flex;flex-direction:column;gap:var(--space-xl);max-width:440px;width:100%;position:relative;z-index:1;}
+.auth-brand{display:flex;align-items:center;gap:12px;color:var(--ivory);}
+.auth-hero-text h2{font-family:var(--font-display);font-size:3rem;font-weight:300;color:var(--ivory);line-height:1.1;}
+.auth-hero-text p{color:rgba(245,240,232,0.65);margin-top:var(--space-md);}
+.auth-right{display:flex;align-items:flex-start;justify-content:center;padding:var(--space-2xl);background:var(--ivory);}
+@media(max-width:768px){.auth-page{grid-template-columns:1fr;}.auth-left{display:none;}.auth-right{padding:var(--space-lg);}}
+</style>
+{% endblock %}

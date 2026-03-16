@@ -1,0 +1,150 @@
+{% extends "shared/dashboard_base.html" %}
+{% block page_title %}Job Opportunities{% endblock %}
+{% block breadcrumb %}Home / <span>Jobs</span>{% endblock %}
+
+{% block sidebar_nav %}
+{% include "student/partials/sidebar.html" %}
+{% endblock %}
+
+{% block dashboard_content %}
+<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-xl);flex-wrap:wrap;gap:var(--space-md);">
+  <div>
+    <h3>Job Opportunities</h3>
+    <p style="font-size:0.9rem;color:var(--text-muted);">Exclusive jobs posted by St. Xavier's alumni</p>
+  </div>
+  <a href="{% url 'ai_job_recommendations' %}" class="btn btn-gold"><i class="fas fa-robot"></i> AI Job Match</a>
+</div>
+
+<!-- Filters -->
+<div class="card" style="margin-bottom:var(--space-xl);">
+  <div style="display:flex;gap:var(--space-md);flex-wrap:wrap;align-items:flex-end;">
+    <div style="flex:1;min-width:200px;">
+      <label class="form-label">Search</label>
+      <div class="search-bar">
+        <i class="fas fa-search search-icon" style="font-size:0.85rem;"></i>
+        <input type="text" placeholder="Job title, company, skill…" id="jobSearch" value="{{ request.GET.q }}">
+      </div>
+    </div>
+    <div style="min-width:150px;">
+      <label class="form-label">Type</label>
+      <select class="form-select" id="typeFilter">
+        <option value="">All Types</option>
+        <option value="Full Time">Full Time</option>
+        <option value="Part Time">Part Time</option>
+        <option value="Contract">Contract</option>
+        <option value="Remote">Remote</option>
+      </select>
+    </div>
+    <div style="min-width:150px;">
+      <label class="form-label">Department</label>
+      <select class="form-select" id="deptFilter">
+        <option value="">All Departments</option>
+        {% for dept in departments %}<option value="{{ dept }}">{{ dept }}</option>{% empty %}
+        <option value="tech">Technology</option><option value="finance">Finance</option><option value="marketing">Marketing</option>{% endfor %}
+      </select>
+    </div>
+    <div style="min-width:150px;">
+      <label class="form-label">Location</label>
+      <select class="form-select" id="locFilter">
+        <option value="">All Locations</option>
+        <option value="bangalore">Bangalore</option>
+        <option value="mumbai">Mumbai</option>
+        <option value="remote">Remote</option>
+      </select>
+    </div>
+    <button class="btn btn-primary" onclick="applyFilters()"><i class="fas fa-filter"></i> Apply</button>
+  </div>
+</div>
+
+<!-- Results header -->
+<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-md);">
+  <p style="color:var(--text-muted);font-size:0.875rem;"><strong style="color:var(--navy);">{{ jobs.count|default:48 }}</strong> jobs found</p>
+  <select class="form-select" style="width:160px;font-size:0.875rem;" id="sortSelect">
+    <option value="-created_at">Newest First</option>
+    <option value="created_at">Oldest First</option>
+    <option value="title">Title A-Z</option>
+  </select>
+</div>
+
+<!-- Job Cards -->
+<div style="display:flex;flex-direction:column;gap:var(--space-md);">
+  {% for job in jobs %}
+  <a href="{% url 'job_detail' job.pk %}" class="job-card">
+    <div class="job-logo">{{ job.company.0 }}</div>
+    <div style="flex:1;min-width:0;">
+      <div style="display:flex;align-items:center;gap:var(--space-sm);flex-wrap:wrap;">
+        <span class="job-title">{{ job.title }}</span>
+        {% if job.is_new %}<span class="badge badge-sage" style="font-size:0.7rem;">NEW</span>{% endif %}
+      </div>
+      <div style="font-size:0.875rem;color:var(--text-secondary);margin-top:2px;">{{ job.company }}</div>
+      <div style="display:flex;gap:var(--space-md);margin-top:6px;flex-wrap:wrap;">
+        <span style="font-size:0.8rem;color:var(--text-muted);"><i class="fas fa-map-marker-alt" style="font-size:0.75rem;"></i> {{ job.location }}</span>
+        <span style="font-size:0.8rem;color:var(--text-muted);"><i class="fas fa-building" style="font-size:0.75rem;"></i> {{ job.department }}</span>
+        {% if job.salary %}<span style="font-size:0.8rem;color:var(--sage);font-weight:500;"><i class="fas fa-rupee-sign" style="font-size:0.75rem;"></i> {{ job.salary }}</span>{% endif %}
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:var(--space-sm);flex-shrink:0;">
+      <span class="badge {% if job.type == 'Full Time' %}badge-navy{% elif job.type == 'Internship' %}badge-gold{% else %}badge-sage{% endif %}">{{ job.type }}</span>
+      <span style="font-size:0.75rem;color:var(--text-muted);">{{ job.created_at|timesince }} ago</span>
+      <span style="font-size:0.75rem;color:var(--text-muted);">{{ job.applications_count|default:0 }} applied</span>
+    </div>
+  </a>
+  {% empty %}
+  {% for j in "123456789012" %}
+  <div class="job-card" style="cursor:pointer;">
+    <div class="job-logo">{% if forloop.counter == 1 %}G{% elif forloop.counter == 2 %}M{% elif forloop.counter == 3 %}A{% elif forloop.counter == 4 %}T{% elif forloop.counter == 5 %}F{% elif forloop.counter == 6 %}I{% elif forloop.counter == 7 %}O{% elif forloop.counter == 8 %}Z{% elif forloop.counter == 9 %}S{% elif forloop.counter == 10 %}N{% elif forloop.counter == 11 %}U{% else %}D{% endif %}</div>
+    <div style="flex:1;min-width:0;">
+      <div style="display:flex;align-items:center;gap:var(--space-sm);flex-wrap:wrap;">
+        <span class="job-title">{% cycle "Software Engineer" "Product Manager" "Data Scientist" "UX Designer" "DevOps Engineer" "Business Analyst" "ML Researcher" "Mobile Developer" "QA Engineer" "Cloud Architect" "UI Developer" "Data Engineer" %}</span>
+        {% if forloop.counter <= 3 %}<span class="badge badge-sage" style="font-size:0.7rem;">NEW</span>{% endif %}
+      </div>
+      <div style="font-size:0.875rem;color:var(--text-secondary);margin-top:2px;">{% cycle "Google" "Microsoft" "Amazon" "Tesla" "Facebook" "IBM" "Oracle" "Zerodha" "Swiggy" "Netflix" "Uber" "Deloitte" %}</div>
+      <div style="display:flex;gap:var(--space-md);margin-top:6px;flex-wrap:wrap;">
+        <span style="font-size:0.8rem;color:var(--text-muted);"><i class="fas fa-map-marker-alt" style="font-size:0.75rem;"></i> {% cycle "Bangalore" "Mumbai" "Remote" "Hyderabad" "Pune" "Chennai" %}</span>
+        <span style="font-size:0.8rem;color:var(--sage);font-weight:500;"><i class="fas fa-rupee-sign" style="font-size:0.75rem;"></i> {% cycle "12-18 LPA" "20-30 LPA" "8-14 LPA" "15-22 LPA" %}</span>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:var(--space-sm);flex-shrink:0;">
+      <span class="badge {% if forloop.counter <= 8 %}badge-navy{% else %}badge-gold{% endif %}">{% if forloop.counter <= 8 %}Full Time{% else %}Internship{% endif %}</span>
+      <span style="font-size:0.75rem;color:var(--text-muted);">{{ forloop.counter }} days ago</span>
+    </div>
+  </div>
+  {% endfor %}
+  {% endfor %}
+</div>
+
+<!-- Pagination -->
+<div style="display:flex;justify-content:center;margin-top:var(--space-2xl);">
+  <div class="pagination">
+    <a href="#" class="page-btn"><i class="fas fa-chevron-left"></i></a>
+    <a href="#" class="page-btn active">1</a>
+    <a href="#" class="page-btn">2</a>
+    <a href="#" class="page-btn">3</a>
+    <a href="#" class="page-btn">…</a>
+    <a href="#" class="page-btn">8</a>
+    <a href="#" class="page-btn"><i class="fas fa-chevron-right"></i></a>
+  </div>
+</div>
+
+{% endblock %}
+{% block extra_css %}
+<style>
+.job-card {
+  display:flex;align-items:center;gap:var(--space-md);
+  padding:var(--space-md) var(--space-lg);
+  background:var(--white);
+  border:1px solid var(--border);
+  border-radius:var(--radius-lg);
+  transition:all var(--transition);
+  text-decoration:none;
+}
+.job-card:hover { border-color:var(--border-gold); box-shadow:var(--shadow-md); transform:translateY(-1px); }
+.job-logo {
+  width:52px;height:52px;border-radius:var(--radius-md);
+  background:var(--navy);color:var(--gold);
+  font-family:var(--font-display);font-weight:700;font-size:1.3rem;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.job-title { font-weight:600;color:var(--navy);font-size:1rem; }
+</style>
+{% endblock %}

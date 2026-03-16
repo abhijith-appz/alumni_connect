@@ -1,0 +1,19 @@
+{# alumni/partials/sidebar.html #}
+<p class="sidebar-section-label">Main</p>
+<a href="{% url 'alumni_dashboard' %}" class="sidebar-link {% if request.resolver_match.url_name == 'alumni_dashboard' %}active{% endif %}"><span class="link-icon"><i class="fas fa-th-large"></i></span> Dashboard</a>
+<a href="{% url 'alumni_profile' %}" class="sidebar-link {% if request.resolver_match.url_name == 'alumni_profile' %}active{% endif %}"><span class="link-icon"><i class="fas fa-user"></i></span> My Profile</a>
+<a href="{% url 'edit_alumni_profile' %}" class="sidebar-link {% if request.resolver_match.url_name == 'edit_alumni_profile' %}active{% endif %}"><span class="link-icon"><i class="fas fa-edit"></i></span> Edit Profile</a>
+<p class="sidebar-section-label">Jobs</p>
+<a href="{% url 'post_job' %}" class="sidebar-link {% if request.resolver_match.url_name == 'post_job' %}active{% endif %}"><span class="link-icon"><i class="fas fa-plus-circle"></i></span> Post a Job</a>
+<a href="{% url 'manage_jobs' %}" class="sidebar-link {% if request.resolver_match.url_name == 'manage_jobs' %}active{% endif %}"><span class="link-icon"><i class="fas fa-briefcase"></i></span> My Job Posts</a>
+<p class="sidebar-section-label">Students</p>
+<a href="{% url 'view_students' %}" class="sidebar-link {% if request.resolver_match.url_name == 'view_students' %}active{% endif %}"><span class="link-icon"><i class="fas fa-user-graduate"></i></span> Student Profiles</a>
+<p class="sidebar-section-label">Community</p>
+<a href="{% url 'alumni_network' %}" class="sidebar-link {% if request.resolver_match.url_name == 'alumni_network' %}active{% endif %}"><span class="link-icon"><i class="fas fa-network-wired"></i></span> Alumni Network</a>
+<a href="{% url 'alumni_events' %}" class="sidebar-link {% if request.resolver_match.url_name == 'alumni_events' %}active{% endif %}"><span class="link-icon"><i class="fas fa-calendar-alt"></i></span> Events</a>
+<p class="sidebar-section-label">Communication</p>
+<a href="{% url 'alumni_messages' %}" class="sidebar-link {% if request.resolver_match.url_name == 'alumni_messages' %}active{% endif %}"><span class="link-icon"><i class="fas fa-comments"></i></span> Messages{% if unread_messages %}<span class="badge-count">{{ unread_messages }}</span>{% endif %}</a>
+<a href="{% url 'notifications' %}" class="sidebar-link {% if request.resolver_match.url_name == 'notifications' %}active{% endif %}"><span class="link-icon"><i class="fas fa-bell"></i></span> Notifications</a>
+<p class="sidebar-section-label">AI Tools</p>
+<a href="{% url 'ai_chat' %}" class="sidebar-link {% if request.resolver_match.url_name == 'ai_chat' %}active{% endif %}"><span class="link-icon"><i class="fas fa-robot"></i></span> AI Assistant</a>
+<a href="{% url 'ai_help_center' %}" class="sidebar-link {% if request.resolver_match.url_name == 'ai_help_center' %}active{% endif %}"><span class="link-icon"><i class="fas fa-question-circle"></i></span> AI Help Center</a>

@@ -1,0 +1,88 @@
+{% extends "shared/dashboard_base.html" %}
+{% block page_title %}Manage Alumni{% endblock %}
+{% block breadcrumb %}Admin / <span>Alumni</span>{% endblock %}
+{% block sidebar_nav %}{% include "admin/partials/sidebar.html" %}{% endblock %}
+
+{% block dashboard_content %}
+<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-xl);flex-wrap:wrap;gap:var(--space-md);">
+  <div><h3>Manage Alumni</h3><p style="color:var(--text-muted);font-size:0.9rem;">Approve and manage alumni registrations</p></div>
+  <div style="display:flex;gap:var(--space-sm);">
+    {% if pending_count %}<span class="badge badge-red" style="font-size:0.875rem;padding:8px 14px;">{{ pending_count }} Pending Approval</span>{% endif %}
+    <a href="#" class="btn btn-outline"><i class="fas fa-download"></i> Export</a>
+  </div>
+</div>
+<div class="tabs" style="margin-bottom:var(--space-lg);">
+  <div class="tabs-list">
+    <button class="tab-item active" onclick="filterTab('all',this)">All Alumni</button>
+    <button class="tab-item" onclick="filterTab('pending',this)">Pending {% if pending_count %}<span class="badge badge-red" style="font-size:0.7rem;padding:2px 6px;margin-left:4px;">{{ pending_count }}</span>{% endif %}</button>
+    <button class="tab-item" onclick="filterTab('approved',this)">Approved</button>
+    <button class="tab-item" onclick="filterTab('rejected',this)">Rejected</button>
+  </div>
+</div>
+<!-- Search -->
+<div class="card" style="margin-bottom:var(--space-lg);">
+  <div style="display:flex;gap:var(--space-md);flex-wrap:wrap;align-items:flex-end;">
+    <div style="flex:1;min-width:200px;"><div class="search-bar"><i class="fas fa-search search-icon" style="font-size:0.85rem;"></i><input type="text" placeholder="Search alumni…"></div></div>
+    <select class="form-select" style="width:160px;"><option>All Departments</option>{% for d in departments %}<option>{{ d }}</option>{% empty %}<option>CS</option><option>MBA</option>{% endfor %}</select>
+    <select class="form-select" style="width:140px;"><option>All Years</option><option value="2024">2024</option>
+        <option value="2023">2023</option>
+        <option value="2022">2022</option>
+        <option value="2021">2021</option>
+        <option value="2020">2020</option>
+        <option value="2019">2019</option>
+        <option value="2018">2018</option>
+        <option value="2015">2015</option>
+        <option value="2010">2010</option>
+        <option value="2005">2005</option></select>
+    <button class="btn btn-primary"><i class="fas fa-filter"></i> Filter</button>
+  </div>
+</div>
+<!-- Table -->
+<div class="card">
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th><input type="checkbox" style="accent-color:var(--gold);"></th><th>Alumni</th><th>Department</th><th>Grad Year</th><th>Company</th><th>Status</th><th>Registered</th><th>Actions</th></tr></thead>
+      <tbody>
+        {% for alumni in alumni_list %}
+        <tr data-status="{{ alumni.status }}">
+          <td><input type="checkbox" style="accent-color:var(--gold);"></td>
+          <td><div style="display:flex;align-items:center;gap:8px;"><div class="avatar avatar-sm" style="background:var(--navy);">{{ alumni.user.first_name.0 }}</div><div><div style="font-weight:500;color:var(--navy);">{{ alumni.user.get_full_name }}</div><div style="font-size:0.75rem;color:var(--text-muted);">{{ alumni.user.email }}</div></div></div></td>
+          <td>{{ alumni.department }}</td><td>{{ alumni.graduation_year }}</td><td>{{ alumni.company }}</td>
+          <td><span class="badge {% if alumni.status == 'approved' %}badge-green{% elif alumni.status == 'pending' %}badge-gold{% else %}badge-red{% endif %}">{{ alumni.status|title }}</span></td>
+          <td style="font-size:0.8125rem;">{{ alumni.created_at|date:"M d, Y" }}</td>
+          <td><div style="display:flex;gap:4px;">
+            {% if alumni.status == 'pending' %}<form method="POST" action="{% url 'approve_alumni' alumni.pk %}">{% csrf_token %}<button type="submit" class="btn btn-sm" style="background:var(--sage);color:white;border:none;font-size:0.75rem;padding:4px 10px;"><i class="fas fa-check"></i></button></form>
+            <form method="POST" action="{% url 'reject_alumni' alumni.pk %}">{% csrf_token %}<button type="submit" class="btn btn-danger btn-sm" style="font-size:0.75rem;padding:4px 10px;"><i class="fas fa-times"></i></button></form>{% endif %}
+            <a href="{% url 'admin_alumni_detail' alumni.pk %}" class="btn btn-ghost btn-sm"><i class="fas fa-eye"></i></a>
+          </div></td>
+        </tr>
+        {% empty %}
+        {% for i in "12345" %}
+        <tr>
+          <td><input type="checkbox" style="accent-color:var(--gold);"></td>
+          <td><div style="display:flex;align-items:center;gap:8px;"><div class="avatar avatar-sm" style="background:var(--navy);">A{{ forloop.counter }}</div><div><div style="font-weight:500;color:var(--navy);">Alumni {{ forloop.counter }}</div><div style="font-size:0.75rem;color:var(--text-muted);">alumni{{ forloop.counter }}@email.com</div></div></div></td>
+          <td>{% cycle "CS" "MBA" "ECE" "Law" "Commerce" %}</td>
+          <td>{% cycle "2018" "2020" "2019" "2015" "2021" %}</td>
+          <td>{% cycle "Google" "TCS" "Amazon" "Infosys" "Wipro" %}</td>
+          <td><span class="badge {% cycle 'badge-gold' 'badge-green' 'badge-green' 'badge-gold' 'badge-green' %}">{% cycle "Pending" "Approved" "Approved" "Pending" "Approved" %}</span></td>
+          <td style="font-size:0.8125rem;">Aug {% cycle "1" "5" "8" "10" "12" %}, 2024</td>
+          <td><div style="display:flex;gap:4px;">{% if forloop.counter == 1 or forloop.counter == 4 %}<button class="btn btn-sm" style="background:var(--sage);color:white;border:none;font-size:0.75rem;padding:4px 10px;"><i class="fas fa-check"></i></button><button class="btn btn-danger btn-sm" style="font-size:0.75rem;padding:4px 10px;"><i class="fas fa-times"></i></button>{% endif %}<button class="btn btn-ghost btn-sm"><i class="fas fa-eye"></i></button></div></td>
+        </tr>
+        {% endfor %}
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>
+function filterTab(status, btn) {
+  document.querySelectorAll('.tab-item').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('tbody tr').forEach(row=>{
+    row.style.display=(status==='all'||row.dataset.status===status)?'table-row':'none';
+  });
+}
+</script>
+{% endblock %}

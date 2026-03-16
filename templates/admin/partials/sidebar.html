@@ -1,0 +1,13 @@
+{# admin/partials/sidebar.html #}
+<p class="sidebar-section-label">Overview</p>
+<a href="{% url 'admin_dashboard' %}" class="sidebar-link {% if request.resolver_match.url_name == 'admin_dashboard' %}active{% endif %}"><span class="link-icon"><i class="fas fa-th-large"></i></span> Dashboard</a>
+<p class="sidebar-section-label">Users</p>
+<a href="{% url 'manage_students' %}" class="sidebar-link {% if request.resolver_match.url_name == 'manage_students' %}active{% endif %}"><span class="link-icon"><i class="fas fa-user-graduate"></i></span> Manage Students</a>
+<a href="{% url 'manage_alumni' %}" class="sidebar-link {% if request.resolver_match.url_name == 'manage_alumni' %}active{% endif %}"><span class="link-icon"><i class="fas fa-users"></i></span> Manage Alumni{% if pending_alumni_count %}<span class="badge-count">{{ pending_alumni_count }}</span>{% endif %}</a>
+<p class="sidebar-section-label">Content</p>
+<a href="{% url 'admin_manage_jobs' %}" class="sidebar-link {% if request.resolver_match.url_name == 'manage_jobs' %}active{% endif %}"><span class="link-icon"><i class="fas fa-briefcase"></i></span> Manage Jobs</a>
+<a href="{% url 'manage_events' %}" class="sidebar-link {% if request.resolver_match.url_name == 'manage_events' %}active{% endif %}"><span class="link-icon"><i class="fas fa-calendar-alt"></i></span> Manage Events</a>
+<a href="{% url 'manage_announcements' %}" class="sidebar-link {% if request.resolver_match.url_name == 'manage_announcements' %}active{% endif %}"><span class="link-icon"><i class="fas fa-bullhorn"></i></span> Announcements</a>
+<p class="sidebar-section-label">Analytics</p>
+<a href="{% url 'system_reports' %}" class="sidebar-link {% if request.resolver_match.url_name == 'system_reports' %}active{% endif %}"><span class="link-icon"><i class="fas fa-chart-bar"></i></span> Reports</a>
+<a href="{% url 'admin_messages' %}" class="sidebar-link {% if request.resolver_match.url_name == 'admin_messages' %}active{% endif %}"><span class="link-icon"><i class="fas fa-envelope"></i></span> Message Center</a>

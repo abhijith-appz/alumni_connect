@@ -1,0 +1,73 @@
+{% extends "shared/dashboard_base.html" %}
+{% block page_title %}Manage Students{% endblock %}
+{% block breadcrumb %}Admin / <span>Students</span>{% endblock %}
+{% block sidebar_nav %}{% include "admin/partials/sidebar.html" %}{% endblock %}
+
+{% block dashboard_content %}
+<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-xl);flex-wrap:wrap;gap:var(--space-md);">
+  <div><h3>Manage Students</h3><p style="color:var(--text-muted);font-size:0.9rem;">{{ total_students|default:"3,521" }} registered students</p></div>
+  <a href="{% url 'system_reports' %}#students" class="btn btn-outline"><i class="fas fa-download"></i> Export</a>
+</div>
+<!-- Filters -->
+<div class="card" style="margin-bottom:var(--space-lg);">
+  <div style="display:flex;gap:var(--space-md);flex-wrap:wrap;align-items:flex-end;">
+    <div style="flex:1;min-width:200px;"><label class="form-label">Search</label><div class="search-bar"><i class="fas fa-search search-icon" style="font-size:0.85rem;"></i><input type="text" placeholder="Name, email, student ID…" id="studentSearch"></div></div>
+    <div><label class="form-label">Department</label><select class="form-select" id="deptFilter" style="width:160px;"><option value="">All Departments</option>{% for dept in departments %}<option>{{ dept }}</option>{% empty %}<option>CS</option><option>MBA</option><option>Engineering</option>{% endfor %}</select></div>
+    <div><label class="form-label">Year</label><select class="form-select" id="yearFilter" style="width:120px;"><option value="">All Years</option><option>Year 1</option><option>Year 2</option><option>Year 3</option><option>Year 4</option></select></div>
+    <div><label class="form-label">Status</label><select class="form-select" id="statusFilter" style="width:130px;"><option value="">All Status</option><option value="active">Active</option><option value="inactive">Inactive</option></select></div>
+    <button class="btn btn-primary" onclick="applyFilters()"><i class="fas fa-filter"></i> Filter</button>
+  </div>
+</div>
+<!-- Table -->
+<div class="card">
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th><input type="checkbox" id="selectAll" style="accent-color:var(--gold);"></th><th>Student</th><th>ID</th><th>Department</th><th>Year</th><th>Email</th><th>Status</th><th>Actions</th></tr></thead>
+      <tbody>
+        {% for student in students %}
+        <tr>
+          <td><input type="checkbox" name="selected" value="{{ student.pk }}" style="accent-color:var(--gold);"></td>
+          <td><div style="display:flex;align-items:center;gap:8px;"><div class="avatar avatar-sm" style="background:var(--navy);">{{ student.user.first_name.0 }}</div><div><div style="font-weight:500;color:var(--navy);">{{ student.user.get_full_name }}</div></div></div></td>
+          <td style="font-family:var(--font-mono);font-size:0.8125rem;">{{ student.student_id }}</td>
+          <td>{{ student.department }}</td>
+          <td>Year {{ student.current_year }}</td>
+          <td style="font-size:0.8125rem;">{{ student.user.email }}</td>
+          <td><span class="badge {% if student.user.is_active %}badge-green{% else %}badge-red{% endif %}">{% if student.user.is_active %}Active{% else %}Inactive{% endif %}</span></td>
+          <td><div style="display:flex;gap:4px;"><a href="{% url 'admin_student_detail' student.pk %}" class="btn btn-ghost btn-sm"><i class="fas fa-eye"></i></a><a href="{% url 'admin_edit_student' student.pk %}" class="btn btn-ghost btn-sm"><i class="fas fa-edit"></i></a><button onclick="deleteUser('student',{{ student.pk }})" class="btn btn-ghost btn-sm" style="color:var(--crimson);"><i class="fas fa-trash"></i></button></div></td>
+        </tr>
+        {% empty %}
+        {% for i in "12345" %}
+        <tr>
+          <td><input type="checkbox" style="accent-color:var(--gold);"></td>
+          <td><div style="display:flex;align-items:center;gap:8px;"><div class="avatar avatar-sm" style="background:var(--navy);">S{{ forloop.counter }}</div><div><div style="font-weight:500;color:var(--navy);">Student {{ forloop.counter }}</div></div></div></td>
+          <td style="font-family:var(--font-mono);font-size:0.8125rem;">SX202400{{ forloop.counter }}</td>
+          <td>{% cycle "Computer Science" "Management" "Engineering" "Law" "Arts" %}</td>
+          <td>Year {% cycle "1" "2" "3" "4" "2" %}</td>
+          <td style="font-size:0.8125rem;">student{{ forloop.counter }}@stxaviers.edu</td>
+          <td><span class="badge badge-green">Active</span></td>
+          <td><div style="display:flex;gap:4px;"><button class="btn btn-ghost btn-sm"><i class="fas fa-eye"></i></button><button class="btn btn-ghost btn-sm"><i class="fas fa-edit"></i></button><button class="btn btn-ghost btn-sm" style="color:var(--crimson);"><i class="fas fa-trash"></i></button></div></td>
+        </tr>
+        {% endfor %}
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <!-- Pagination -->
+  <div style="display:flex;align-items:center;justify-content:space-between;padding-top:var(--space-md);border-top:1px solid var(--border);flex-wrap:wrap;gap:var(--space-md);">
+    <p style="font-size:0.8125rem;color:var(--text-muted);">Showing 1–25 of {{ total_students|default:3521 }}</p>
+    <div class="pagination">
+      <a href="#" class="page-btn"><i class="fas fa-chevron-left"></i></a>
+      <a href="#" class="page-btn active">1</a><a href="#" class="page-btn">2</a><a href="#" class="page-btn">3</a><a href="#" class="page-btn">…</a><a href="#" class="page-btn">141</a>
+      <a href="#" class="page-btn"><i class="fas fa-chevron-right"></i></a>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>
+document.getElementById('selectAll').addEventListener('change',function(){
+  document.querySelectorAll('input[name="selected"]').forEach(cb=>cb.checked=this.checked);
+});
+function deleteUser(type,id){if(confirm('Are you sure?')) window.location='delete/'+id;}
+</script>
+{% endblock %}

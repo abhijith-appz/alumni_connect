@@ -1,0 +1,57 @@
+{% extends "shared/dashboard_base.html" %}
+{% block page_title %}My Job Posts{% endblock %}
+{% block breadcrumb %}Jobs / <span>Manage</span>{% endblock %}
+{% block sidebar_nav %}{% include "alumni/partials/sidebar.html" %}{% endblock %}
+{% block dashboard_content %}
+<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-xl);flex-wrap:wrap;gap:var(--space-md);">
+  <div><h3>My Job Posts</h3><p style="color:var(--text-muted);">Manage the jobs and internships you've shared</p></div>
+  <a href="{% url 'post_job' %}" class="btn btn-gold"><i class="fas fa-plus"></i> Post New Job</a>
+</div>
+<div class="tabs" style="margin-bottom:var(--space-lg);">
+  <div class="tabs-list">
+    <button class="tab-item active" onclick="filterJobs('all',this)">All Posts</button>
+    <button class="tab-item" onclick="filterJobs('active',this)">Active</button>
+    <button class="tab-item" onclick="filterJobs('draft',this)">Drafts</button>
+    <button class="tab-item" onclick="filterJobs('closed',this)">Closed</button>
+  </div>
+</div>
+<div style="display:flex;flex-direction:column;gap:var(--space-md);">
+  {% for job in my_jobs %}
+  <div class="my-job-card" data-status="{{ job.status }}">
+    <div style="flex:1;">
+      <div style="display:flex;align-items:center;gap:var(--space-sm);margin-bottom:6px;flex-wrap:wrap;">
+        <h5 style="font-size:1rem;color:var(--navy);">{{ job.title }}</h5>
+        <span class="badge {% if job.status == 'active' %}badge-green{% elif job.status == 'draft' %}badge-gold{% else %}badge-navy{% endif %}">{{ job.status|title }}</span>
+        <span class="badge badge-navy">{{ job.type }}</span>
+      </div>
+      <div style="font-size:0.875rem;color:var(--text-secondary);">{{ job.company }} · {{ job.location }}</div>
+      <div style="font-size:0.8rem;color:var(--text-muted);margin-top:4px;"><i class="fas fa-users" style="font-size:0.75rem;"></i> {{ job.applications_count|default:0 }} applications &nbsp;·&nbsp; <i class="fas fa-eye" style="font-size:0.75rem;"></i> {{ job.views|default:0 }} views &nbsp;·&nbsp; Posted {{ job.created_at|timesince }} ago</div>
+    </div>
+    <div class="job-actions" style="display:flex;flex-direction:column;gap:var(--space-sm);flex-shrink:0;">
+      <a href="{% url 'edit_job' job.pk %}" class="btn btn-outline btn-sm"><i class="fas fa-edit"></i> Edit</a>
+      {% if job.status == 'active' %}<form method="POST" action="{% url 'close_job' job.pk %}">{% csrf_token %}<button type="submit" class="btn btn-ghost btn-sm" style="width:100%;"><i class="fas fa-times-circle"></i> Close</button></form>
+      {% else %}<form method="POST" action="{% url 'activate_job' job.pk %}">{% csrf_token %}<button type="submit" class="btn btn-ghost btn-sm" style="width:100%;color:var(--sage);"><i class="fas fa-check-circle"></i> Activate</button></form>{% endif %}
+      <form method="POST" action="{% url 'delete_job' job.pk %}" onsubmit="return confirm('Delete this job post?')">{% csrf_token %}<button type="submit" class="btn btn-ghost btn-sm" style="width:100%;color:var(--crimson);"><i class="fas fa-trash"></i> Delete</button></form>
+    </div>
+  </div>
+  {% empty %}
+  <div class="empty-state">
+    <span class="empty-state-icon">💼</span>
+    <h5>No job posts yet</h5>
+    <p>Share job openings from your company with students and alumni.</p>
+    <a href="{% url 'post_job' %}" class="btn btn-gold"><i class="fas fa-plus"></i> Post Your First Job</a>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>
+function filterJobs(status, btn) {
+  document.querySelectorAll('.tab-item').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.my-job-card').forEach(c=>{
+    c.style.display=(status==='all'||c.dataset.status===status)?'flex':'none';
+  });
+}
+</script>
+{% endblock %}

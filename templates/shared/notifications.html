@@ -1,0 +1,98 @@
+{% extends "shared/dashboard_base.html" %}
+{% block page_title %}Notifications{% endblock %}
+{% block breadcrumb %}Home / <span>Notifications</span>{% endblock %}
+{% block sidebar_nav %}
+{% if user.is_student %}{% include "student/partials/sidebar.html" %}
+{% elif user.is_alumni %}{% include "alumni/partials/sidebar.html" %}
+{% else %}{% include "admin/partials/sidebar.html" %}{% endif %}
+{% endblock %}
+
+{% block dashboard_content %}
+<div style="max-width:720px;margin:0 auto;">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-xl);">
+    <div>
+      <h3>Notifications</h3>
+      <p style="color:var(--text-muted);font-size:0.9rem;">{% if unread_count %}{{ unread_count }} unread{% else %}All caught up!{% endif %}</p>
+    </div>
+    <form method="POST" action="{% url 'mark_all_read' %}">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-ghost btn-sm"><i class="fas fa-check-double"></i> Mark All as Read</button>
+    </form>
+  </div>
+
+  <!-- Filter Tabs -->
+  <div class="tabs" style="margin-bottom:var(--space-lg);">
+    <div class="tabs-list">
+      <button class="tab-item active" onclick="filterNotifs('all',this)">All</button>
+      <button class="tab-item" onclick="filterNotifs('job',this)">Jobs</button>
+      <button class="tab-item" onclick="filterNotifs('event',this)">Events</button>
+      <button class="tab-item" onclick="filterNotifs('message',this)">Messages</button>
+      <button class="tab-item" onclick="filterNotifs('system',this)">System</button>
+    </div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:var(--space-sm);" id="notifList">
+    {% for notif in notifications %}
+    <div class="notif-full-item {% if not notif.read %}unread{% endif %}" data-type="{{ notif.type }}" onclick="markRead({{ notif.pk }})">
+      <div class="notif-full-icon {% if notif.type == 'job' %}job{% elif notif.type == 'event' %}event{% elif notif.type == 'message' %}msg{% else %}sys{% endif %}">
+        {% if notif.type == 'job' %}💼{% elif notif.type == 'event' %}📅{% elif notif.type == 'message' %}💬{% else %}🔔{% endif %}
+      </div>
+      <div style="flex:1;">
+        <div style="font-weight:{% if not notif.read %}600{% else %}500{% endif %};color:var(--navy);font-size:0.9rem;">{{ notif.message }}</div>
+        <div style="font-size:0.775rem;color:var(--text-muted);margin-top:2px;">{{ notif.created_at|timesince }} ago</div>
+      </div>
+      {% if not notif.read %}<div style="width:8px;height:8px;border-radius:50%;background:var(--gold);flex-shrink:0;margin-top:6px;"></div>{% endif %}
+    </div>
+    {% empty %}
+    {% for i in "123456789" %}
+    <div class="notif-full-item {% if forloop.counter <= 3 %}unread{% endif %}" data-type="{% cycle 'job' 'message' 'event' 'job' 'system' 'message' 'event' 'job' 'system' %}">
+      <div class="notif-full-icon {% cycle 'job' 'msg' 'event' 'job' 'sys' 'msg' 'event' 'job' 'sys' %}">{% cycle "💼" "💬" "📅" "💼" "🔔" "💬" "📅" "💼" "🔔" %}</div>
+      <div style="flex:1;">
+        <div style="font-weight:{% if forloop.counter <= 3 %}600{% else %}500{% endif %};color:var(--navy);font-size:0.9rem;">{% if forloop.counter == 1 %}New job posted: Software Engineer at Google by Anil Kumar{% elif forloop.counter == 2 %}Anil Kumar replied to your message{% elif forloop.counter == 3 %}Reminder: Annual Alumni Meet on Aug 18{% elif forloop.counter == 4 %}New internship: UI/UX Intern at Adobe{% elif forloop.counter == 5 %}Your profile was viewed 12 times this week{% elif forloop.counter == 6 %}New message from Sunita Rao{% elif forloop.counter == 7 %}Event registration confirmed: Career Fair Webinar{% elif forloop.counter == 8 %}Job application status updated{% else %}System maintenance scheduled for Sunday 2 AM{% endif %}</div>
+        <div style="font-size:0.775rem;color:var(--text-muted);margin-top:2px;">{% cycle "5 min" "1 hour" "2 hours" "1 day" "2 days" "3 days" "1 week" "1 week" "2 weeks" %} ago</div>
+      </div>
+      {% if forloop.counter <= 3 %}<div style="width:8px;height:8px;border-radius:50%;background:var(--gold);flex-shrink:0;margin-top:6px;"></div>{% endif %}
+    </div>
+    {% endfor %}
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.notif-full-item {
+  display:flex;align-items:flex-start;gap:var(--space-md);
+  padding:var(--space-md) var(--space-lg);
+  background:var(--white);border:1px solid var(--border);
+  border-radius:var(--radius-lg);cursor:pointer;
+  transition:all var(--transition);
+}
+.notif-full-item:hover{border-color:var(--border-gold);box-shadow:var(--shadow-sm);}
+.notif-full-item.unread{background:var(--gold-pale);border-color:var(--border-gold);}
+.notif-full-icon {
+  width:40px;height:40px;border-radius:var(--radius-md);
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.1rem;flex-shrink:0;
+}
+.notif-full-icon.job{background:var(--gold-pale);}
+.notif-full-icon.event{background:rgba(74,124,111,0.12);}
+.notif-full-icon.msg{background:rgba(15,31,61,0.08);}
+.notif-full-icon.sys{background:var(--ivory-dark);}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function filterNotifs(type, btn) {
+  document.querySelectorAll('.tab-item').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.notif-full-item').forEach(item=>{
+    item.style.display=(type==='all'||item.dataset.type===type)?'flex':'none';
+  });
+}
+function markRead(id) {
+  fetch('/notifications/read/'+id+'/', {method:'POST', headers:{'X-CSRFToken':'{{ csrf_token }}'}});
+}
+</script>
+{% endblock %}
